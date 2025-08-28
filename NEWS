@@ -1,0 +1,64 @@
+Noteworthy changes in version 2.0.0 (2025-06-03)  [C7/A0/R0]
+------------------------------------------------
+
+ * First separate release of GpgME++.
+
+ * build: The build system was changed from autotools to cmake.
+
+ * The gpgme++ folder containing the header files is no longer exported
+   as include directory. All headers have to be included with the prefix
+   gpgme++/ now.
+
+ * New function Context::generateRandomBytes to get cryptographically
+   strong random bytes from gpg.  [T6694]
+
+ * New function Context::generateRandomValue to get a cryptographically
+   strong unsigned integer random value.  [T6694]
+
+ * New flag to re-encrypt OpenPGP data (requires GnuPG 2.5.1).  [D607]
+
+ * New decrypt flag to skip the actual decryption so that information
+   about the recipients can be retrieved.
+
+ * Removed the TrustItem listing functionality which used GpgME's trustlist
+   feature which worked only for a short period in 2003.  [T4834]
+
+ * Interface changes relative to the 1.24 branch of gpgme:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Context::RandomMode                         NEW.
+ Context::generateRandomBytes                NEW.
+ Context::generateRandomValue                NEW.
+ Context::DecryptionFlags::DecryptListOnly   NEW.
+ Context::EncryptionFlags::AddRecipient      NEW.
+ Context::EncryptionFlags::ChangeRecipient   NEW.
+ Context::CreationFlags                      NEW.
+ Context::createKey                     CHANGED: New overload; deprecated old.
+ Context::startCreateKey                CHANGED: New overload; deprecated old.
+ Context::createSubkey                  CHANGED: New overload; deprecated old.
+ Context::startCreateSubkey             CHANGED: New overload; deprecated old.
+ Error::isError                              NEW.
+ Error::isSuccess                            NEW.
+ RandomBytesResult                           NEW.
+ RandomValueResult                           NEW.
+ Context::createKeyEx                        DEPRECATED.
+ Context::startTrustItemListing              REMOVED.
+ Context::nextTrustItem                      REMOVED.
+ Context::endTrustItemListing                REMOVED.
+ EventLoopInteractor::nextTrustItemEvent     REMOVED.
+ GPGMEPP_MAKE_SAFE_BOOL_OPERATOR             REMOVED.
+ TrustItem                                   REMOVED.
+
+
+Noteworthy changes in earlier versions can be found in the NEWS file of
+gpgme.
+
+
+ Copyright 2024 g10 Code GmbH
+
+ This file is free software; as a special exception the author gives
+ unlimited permission to copy and/or distribute it, with or without
+ modifications, as long as this notice is preserved.
+
+ This file is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+ implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

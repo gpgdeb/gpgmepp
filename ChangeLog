@@ -1,0 +1,2616 @@
+2025-06-03  Werner Koch  <wk@gnupg.org>
+
+	Release 2.0.0.
+	+ commit 301d39f8b97a79369292280e201e45f472d71e91
+
+
+2025-06-03  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Fix logic for appending "-unknown" to version number.
+	+ commit 1e948b3f3ee10806eaee282e489609fa370277d8
+	* cmake/modules/G10GetFullVersion.cmake (G10_GET_FULL_VERSION): Use
+	DEFINED to check if output variable is set.
+
+2025-05-27  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	On Windows, use gpgme_off_t and gpgme_ssize_t in the API.
+	+ commit b75caf9ce2bcf3813a10bc889b4fa4e0a7d63a4e
+	* src/callbacks.cpp (passphrase_callback): Use gpgme_ssize_t.
+	(data_seek_callback): Don't cast offset to off_t.
+	* src/data.cpp (Data::Data, Data::read, Data::write, Data::seek): Use
+	gpgme_off_t and gpgme_ssize_t instead of off_t and ssize_t everywhere.
+	* src/data.h (Data::Data, Data::read, Data::write, Data::seek): On
+	Windows, use gpgme_off_t and gpgme_ssize_t in the API.
+	* src/interfaces/dataprovider.h (DataProvider::read,
+	DataProvider::write, DataProvider::seek): Ditto.
+
+2025-05-26  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Fix wrong definition of operator<<(std::ostream &, const Error &)
+	+ commit 67abbf811080645430e24eb532ff0d26ea83b0c2
+	* src/error.cpp (operator<<): Put definition in namespace GpgME.
+
+2025-05-19  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Don't compile with _FILE_OFFSET_BITS=64 on Windows (MinGW)
+	+ commit a13ba8a8170e81733c89af794f13839891efd563
+	* cmake/modules/G10CompilerSettings.cmake: Remove adding definition of
+	-D_FILE_OFFSET_BITS=64 for MinGW.
+
+2025-05-15  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Move definition of functions declared in error.h to error.cpp.
+	+ commit 23c297d13e0437ae88e81230ba44d97b462dc93b
+	* src/CMakeLists.txt (Gpgmepp_SOURCES): Add new file.
+	* src/context.cpp (format_error, Error::source, Error::asString,
+	Error::asStdString, Error::code, Error::sourceID, Error::isSuccess,
+	Error::isCanceled, Error::isError, Error::toErrno,
+	Error::hasSystemError, Error::setSystemError, Error::setErrno,
+	Error::fromSystemError, Error::fromErrno, Error::fromCode,
+	operator<<(std::ostream &, const Error &)): Move to...
+	* src/error.cpp: ...this new file.
+
+	Remove long obsolete feature checking API.
+	+ commit ee85d38a2f9e62efa4973c46b91e9953d09d66f1
+	* src/global.h (enum Feature, enum Feature2, hasFeature): Remove.
+	* src/context.cpp (supported_features, supported_features2, hasFeature):
+	Remove.
+
+2025-05-14  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Remove deprecated functions and types.
+	+ commit 9200517f23c5b1e2df4e1773d64b2d45a3cdb864
+	src/decryptionresult.h (unsupportedAlgortihm, wrongKeyUsage): Remove.
+	src/key.h (Key::canReallySign, Key::isSecret,
+	UserID::Signature::Notation, non-const UserID::Signature::operator<
+	overload): Remove.
+	src/keygenerationresult.h (KeyGenerationResult::primaryKeyGenerated,
+	KeyGenerationResult::subkeyGenerated): Remove.
+	src/verificationresult.h (Signature::Notation,
+	Signature::wrongKeyUsage): Remove.
+
+	Add CreationFlags and simplify API of createKey and createSubkey.
+	+ commit d3559c8abcfe8dd66e3a674d041459ab5341b956
+	* src/context.h (enum Context::CreationFlags): New.
+	(Context::createKey, Context::startCreateKey, Context::createSubkey,
+	Context::startCreateSubkey): Add overload. Deprecate old overload.
+	(Context::createKeyEx): Deprecate.
+	(operator|, operator|=): New.
+	* src/context.cpp ((Context::createKey, Context::startCreateKey,
+	Context::createSubkey, Context::startCreateSubkey): Define new overload.
+
+	* tests/CMakeLists.txt: Add new test program.
+	* tests/run-createkey.cpp: New.
+
+2025-05-13  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	New decrypt flag DecryptListOnly.
+	+ commit 8b853b09d54242dcf3978303f407a1106db747d1
+	src/context.h (enum DecryptionFlags): Add value DecryptListOnly.
+
+2025-05-12  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Make checking if Error represents success or error more easy.
+	+ commit 836885ea9c68b57e27d463130cfeb73e5849bcd8
+	* src/context.cpp, src/error.h (Error::isSuccess, Error::isError): New.
+	* src/error.h (Error::operator bool): Use Error::isError.
+
+	Replace usage of safe-bool idiom with explicit conversion operator.
+	+ commit 4b9b73a8b2da170772e8900f7cb479c022b1ec05
+	* src/global.h (GPGMEPP_MAKE_SAFE_BOOL_OPERATOR): Remove.
+	* src/configuration.h (class Component, class Option, class Argument):
+	Replace "safe bool operator" with explicit operator bool.
+	* src/error.h (class Error): Ditto.
+
+2025-05-06  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Append the linker search paths to the RPATH for installed targets
+	+ commit 2b30653d48b52bab2c4a00eff288303279b491e0
+	* cmake/modules/G10CMakeSettings.cmake: For Unix systems, enable
+	CMAKE_INSTALL_RPATH_USE_LINK_PATH.
+
+2025-05-05  Carl Schwan  <carl@carlschwan.eu>
+
+	Add missing Context::EncryptionFlags.
+	+ commit 7a82afe66309cb7aa9956586d11749be6c6dd6e5
+	* src/context.cpp: Add AddRecipient and ChangeRecipient enum value
+
+2025-04-11  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add missing transition and remove two ignored (and wrong) transitions.
+	+ commit 5b77f4072d03342b8719bbe93fc77641fffb476a
+	* src/gpgsignkeyeditinteractor.cpp (makeTable): Remove two transitions.
+	Add one transition.
+
+2025-04-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Validate the transition map.
+	+ commit 6f2e91d4d25afa6934ceaf1563a4d826a904d644
+	* src/gpgsignkeyeditinteractor.cpp (makeTable): Assert that all
+	transitions go from one state to a different state.
+
+	Ensure that all transitions go from one state to a different state.
+	+ commit aee2b30482406e677dbddf1a68b2a11a5dc70adf
+	* src/gpgsignkeyeditinteractor.cpp (makeTable): Replace transitions from
+	CONFIRM to CONFIRM with transitions from CONFIRM to CONFIRM2 and vice
+	versa. Add transitions from CONFIRM2 to some other state for all
+	transitions from CONFIRM to some other state.
+
+2025-03-24  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add API for generating random bytes and single random values.
+	+ commit a68baf81e3dfdb51c961de3f2f4e4d670d899f63
+	* src/randomresults.h: New.
+	* src/CMakeLists.txt: Add new file.
+	* src/context.h (class Context): Add enum RandomMode.
+	* src/context.h, src/context.cpp (class Context): Add member
+	functions generateRandomBytes and generateRandomValue.
+
+	* tests/run-genrandom.cpp: New.
+	* tests/CMakeLists.txt: Add new file.
+
+2025-02-26  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Remove never working TrustItem listing functionality.
+	+ commit 532bc8b248ccc8f5805ce47d42f1838a378a4260
+	* src/CMakeLists.txt (Gpgmepp_SOURCES): Remove trustitem.cpp.
+	(Gpgmepp_HEADERS): Remove trustitem.h.
+	* src/context.cpp, src/context.h (class Context): Remove member
+	functions startTrustItemListing, nextTrustItem, endTrustItemListing.
+	* src/context_p.h (enum Context::Private::Operation): Remove value
+	TrustList.
+	* src/eventloopinteractor.cpp (EventLoopInteractor::Private::eventIOCb):
+	Remove handling of event GPGME_EVENT_NEXT_TRUSTITEM.
+	* src/eventloopinteractor.h (EventLoopInteractor): Remove pure virtual
+	nextTrustItemEvent.
+	* src/trustitem.cpp, src/trustitem.h: Remove files.
+
+	build: Require same major/minor version of gpgme as version of gpgmepp.
+	+ commit 6f94663cfc2c3d212be4bd9475ef95c94f5f9c08
+	* CMakeLists.txt: Set GPGME_REQUIRED_VERSION to
+	VERSION_MAJOR.VERSION_MINOR.0.
+
+2025-01-29  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Run chmod instead of using cmake's file CHMOD command.
+	+ commit 69dde050edd4ef9da8d5879bb2f4c9de07d86f5e
+	* cmake/modules/G10AddDistTargets.cmake,
+	cmake/modules/G10AddReleaseTargets.cmake,
+	cmake/modules/G10GitHooks.cmake: Replace file(CHMOD ...) with
+	execute_process(COMMAND chmod +x ...).
+
+	doc: Update build instructions and some other documentation.
+	+ commit 6df272737689e3221e7115a0e064ec9e912df9fe
+	* INSTALL: Remove.
+	* INSTALL.md: New.
+	* README: Remove remark about missing key edit interface. Update
+	reference to tests in QGpgME. Mention examples in tests folder. Update
+	URL of KDE's coding style.
+	* README.GIT: Remove.
+	* doc/HACKING: Update URL of KDE's coding style. Add information about
+	GPGMEPP_INTERACTOR_DEBUG variable.
+
+2025-01-22  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Optionally, add host value to gpgmepp's pkgconfig file.
+	+ commit 415ac3f1adfa466d2cfcf683fbd6b61443cec787
+	* CMakeLists.txt: Add option PKGCONFIG_HOST (default "").
+	* src/CMakeLists.txt: Set replacement for pkgconfig_host_line variable
+	referenced in gpgmepp.pc.in if PKGCONFIG_HOST is set.
+	* src/gpgmepp.pc.in: Add placeholder for pkgconfig_host_line.
+
+	build: Allow building gpgmepp as static library.
+	+ commit 8422057b85f8b5923166997e0ebf0d5b5646a833
+	* CMakeLists.txt: Add options ENABLE_SHARED (default ON) and
+	ENABLE_STATIC (default OFF). Build tests only with the shared library.
+	* src/CMakeLists.txt: Add target Gpgmepp for the shared library if
+	ENABLE_SHARED is true. Add target GpgmeppStatic for the static library
+	if ENABLE_STATIC is true. Set sources, includes, properties, etc. only
+	for enabled targets. If the shared library isn't built then generate the
+	export header with a dummy shared library. Install the cmake config
+	files only for the shared library.
+
+	build: Always compile with _FILE_OFFSET_BITS=64 on Windows (MinGW)
+	+ commit 629daa8492de4c0a42e4a3be31eafad072a4524b
+	* cmake/modules/G10CompilerSettings.cmake: Add -D_FILE_OFFSET_BITS=64
+	for MinGW.
+
+2025-01-20  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Add the usual Git hooks.
+	+ commit a06f8d41bbaeec10230d0e5067517cab79b6326e
+	* CMakeLists.txt: Include G10GitHooks. Call g10_configure_git_hooks.
+	* cmake/modules/G10GitHooks.cmake: New.
+
+	build: Add custom targets only on Unix-like systems.
+	+ commit ffa48fbaf787d25a1f632aaf8244e4ca479b8709
+	* CMakeLists.txt: Call g10_add_gen_changelog_target,
+	g10_add_dist_targets, and g10_add_release_targets only for UNIX.
+
+	build: Add "gen-swdb", "release", and "sign-release" targets.
+	+ commit 8747ce7ff4cca73052ae48884f2edfe4ad31e110
+	* CMakeLists.txt: Include G10AddReleaseTargets. Add the release targets.
+	* cmake/modules/G10AddReleaseTargets.cmake,
+	cmake/modules/g10_generate_swdb.sh.in,  cmake/modules/g10_release.sh.in,
+	cmake/modules/g10_sign-release.sh.in: New.
+
+	build: Generate ChangeLog and add it to the tarball.
+	+ commit f1698cb2a6f009990dcfa7709ead2b7974012e36
+	* .gitattributes: New.
+	* CMakeLists.txt: Include G10AddGenChangeLogTarget. Add "gen-ChangeLog"
+	target. Make "dist" target depend on "gen-ChangeLog" target.
+	* cmake/modules/G10AddGenChangeLogTarget.cmake,
+	cmake/modules/g10_generate_ChangeLog.cmake.in: New.
+
+	build: Add "dist" and "distcheck" targets.
+	+ commit 585c31afca6e94cf71a0b890a4474e051bf322cc
+	* CMakeLists.txt: Include G10AddDistTargets. Set EXTRA_DIST. Add "dist"
+	and "distcheck" target.
+	* cmake/modules/G10AddDistTarget.cmake, cmake/modules/g10_dist.sh.in,
+	cmake/modules/g10_distcheck.sh.in: New.
+
+	build: Add "uninstall" target.
+	+ commit d7890971eb2e1ac1533b55ae55d1200e9a635e0f
+	* CMakeLists.txt: Include ECMUninstallTarget.
+	* cmake/modules/ECMUninstallTarget.cmake,
+	cmake/modules/ecm_uninstall.cmake.in: New.
+
+	build: Add cmake files for building the tests.
+	+ commit dacfe7f9cad56e368afaec9368ac49504b5ee2bc
+	* CMakeLists.txt: Add subdirectory tests to the build.
+	* cmake/modules/G10CMakeSettings.cmake: Add option BUILD_TESTING.
+	* tests/CMakeLists.txt: New.
+	* tests/Makefile.am: Remove.
+	* tests/README: Update.
+
+	build: Generate and install pkg-config file with cmake.
+	+ commit ffcd1ca3b7aba8ffbec05fedc9ebb88b8eeea402
+	* src/CMakeLists.txt: Generate and install gpgmepp.pc.
+	* src/gpgmepp.pc.in: Use cmake variables. Use ${prefix}/${exec_prefix}
+	for exec_prefix, includedir, libdir. Remove host. Use fixed values for
+	Cflags and Libs.
+
+	build: Create VERSION file with full version and commit ID.
+	+ commit 192f4e71a52020ea7ebd230e2d13be86f2ef3f63
+	* CMakeLists.txt: Include G10GetFullVersion. Get full version and
+	commit ID. Write VERSION file.
+	* cmake/modules/G10GetFullVersion.cmake: New.
+
+	build: Generate version file and cmake config files with cmake modules.
+	+ commit 6148e7e68bea3ce1d1c30df999d4dbd447fa06e0
+	* cmake/modules/ECMSetupVersion.cmake,
+	cmake/modules/ECMVersionHeader.h.in: New.
+	* cmake/modules/G10CMakeSettings.cmake: Enable versioned DLLs for MinGW
+	builds.
+	* src/CMakeLists.txt: Remove unused variables. Use ecm_setup_version
+	instead of configure_file to generate gpgmepp_version.h and
+	GpgmeppConfigVersion.cmake. Use configure_package_config_file instead
+	of configure_file to generate the GpgmeppConfig.cmake files. Generate
+	the exported GpgmeppTargets*.cmake files and install them. Install the
+	Find modules.
+	* src/GpgmeppConfig.cmake.in: New.
+	* src/GpgmeppConfig-msvc.cmake.in.in, src/GpgmeppConfig-w32.cmake.in.in,
+	src/GpgmeppConfig.cmake.in.in, src/GpgmeppConfigVersion.cmake.in,
+	src/gpgmepp_version.h.in: Remove.
+
+	build: Generate the export header.
+	+ commit 08760bd6352828a599fb0f0f7be5374e0bc96167
+	* src/CMakeLists.txt: Remove compile definition BUILDING_GPGMEPP. Remove
+	gpgmepp_export.h from gpgmepp_HEADERS. Use generate_export_header
+	to generate gpgmepp_export.h. Create a copy of the export header in a
+	gpgme++/ folder in the build folder. Install the generated header.
+	* src/gpgmepp_export.h: Remove.
+	* src/interfaces/{assuantransaction.h,dataprovider.h,statusconsumer.h}:
+	Include export header with gpgme++/gpgmepp_export.h.
+
+	build: Move common cmake and compiler settings to cmake modules.
+	+ commit 94bc585c92d2d693da9f9040b18defbed2b7c0e4
+	* CMakeLists.txt: Don't set a few variables. Include G10CMakeSettings
+	and G10CompilerSettings.
+	* cmake/modules/G10CMakeSettings.cmake,
+	cmake/modules/G10CompilerSettings.cmake: New.
+	* src/CMakeLists.txt: Don't set include directories for PRIVATE and
+	PUBLIC scope. Set include directory for INTERFACE scope.
+
+	build: Add support for cmake and remove support for autotools.
+	+ commit 106eb525bafa6df94229625ef92ead5e0c0ab156
+	* CMakeLists.txt, cmake/modules/FindGpgme.cmake,
+	cmake/modules/FindLibGpgError.cmake, src/CMakeLists.txt,
+	src/GpgmeppConfig-msvc.cmake.in.in: New.
+	* Makefile.am, autogen.rc, autogen.sh, build-aux/compile,
+	build-aux/config.guess, build-aux/config.sub, build-aux/depcomp,
+	build-aux/install-sh, build-aux/libtool-patch.sed, build-aux/ltmain.sh,
+	build-aux/missing, build-aux/mkinstalldirs, configure.ac,
+	m4/ax_cxx_compile_stdcxx.m4, m4/ax_gcc_func_attribute.m4,
+	m4/gpg-error.m4, m4/gpgme.m4, m4/libtool.m4, m4/ltoptions.m4,
+	m4/ltsugar.m4, m4/ltversion.m4, m4/lt~obsolete.m4, src/Makefile.am:
+	Remove.
+
+2024-12-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	doc: Fix a few license headers.
+	+ commit 07060c4719552a662c09accd335e86b4bc237e1d
+	* src/GpgmeppConfig-w32.cmake.in.in, src/GpgmeppConfig.cmake.in.in,
+	src/GpgmeppConfigVersion.cmake.in: Fix license headers.
+	* src/trustitem.cpp, src/trustitem.h: Fix project name.
+	* tests/run-getkey.cpp, tests/run-keylist.cpp, tests/run-verify.cpp:
+	Fix license headers.
+
+	Avoid clashes of gpgme++ headers with other headers.
+	+ commit ca6c423b477d932ab2027a34379bacaa0ea410cd
+	* src/GpgmeppConfig-w32.cmake.in.in, src/GpgmeppConfig.cmake.in.in:
+	Don't put gpgme++ subfolder in interface include paths.
+
+2024-12-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add files for building the project with autotools.
+	+ commit 31819fdb8b5f39720ebe50f613bcd4c867f2c166
+	* COPYING, COPYING.LESSER, INSTALL, README.GIT, autogen.sh,
+	build-aux/compile, build-aux/config.guess, build-aux/config.sub,
+	build-aux/depcomp, build-aux/install-sh, build-aux/libtool-patch.sed,
+	build-aux/ltmain.sh, build-aux/missing, build-aux/mkinstalldirs,
+	m4/ax_cxx_compile_stdcxx.m4, m4/ax_gcc_func_attribute.m4,
+	m4/gpg-error.m4, m4/libtool.m4, m4/ltoptions.m4, m4/ltsugar.m4,
+	m4/ltversion.m4, m4/lt~obsolete.m4: New.
+	* .gitignore, AUTHORS, COPYING.LIB, ChangeLog, NEWS, autogen.rc,
+	configure.ac: New.
+	* Makefile.am (EXTRA_DIST): Add autogen.sh, autogen.rc,
+	build-aux/libtool-patch.sed, doc/DCO, doc/HACKING, VERSION.
+	(RELEASE_ARCHIVE_SUFFIX, ACLOCAL_AMFLAGS, dist-hook, distcheck-hook,
+	.PHONY, gen_start_date, gen-ChangeLog, RELEASE_NAME, release,
+	sign-release): New (copied with minor adjustments from gpgme's top-level
+	Makefile.am).
+	* build-aux/git-hooks/commit-msg: New.
+	* build-aux/git-log-footer: New (copied with some adjustments from
+	gpgme).
+	* doc/DCO, doc/HACKING: New (copied with some adjustments from gpgme).
+	* m4/gpgme.m4: New (copied from gpgme/src/gpgme.m4).
+	* src/GpgmeppConfig-w32.cmake.in.in, src/GpgmeppConfig.cmake.in.in:
+	Remove @LIBASSUAN_LIBS@ from the INTERFACE_LINK_LIBRARIES property of
+	gpgmepp.
+	* src/Makefile.am (AM_CPPFLAGS): Replace include path of gpgme relative
+	to top_builddir with @GPGME_CFLAGS@. Replace @GPGME_CPP_CFLAGS@ with
+	@GPGMEPP_CFLAGS@. Remove unneeded @LIBASSUAN_CFLAGS@.
+	(libgpgmepp_la_LIBADD): Replace relative paths of libgpgme.la with
+	@GPGME_LIBS@. Remove unneeded @LIBASSUAN_LIBS@.
+
+	* tests/Makefile.am (LDADD): Adjust paths of libgpgmepp.la. Replace
+	relative paths of libgpgme.la with @GPGME_LIBS@.
+	(AM_CPPFLAGS): Adjust include paths of source files. Replace relative
+	include paths of gpgme with @GPGME_CFLAGS@. Remove unneeded
+	@LIBASSUAN_CFLAGS@. Remove unneeded define of TOP_SRCDIR.
+
+2024-11-14  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add Kyber algorithm.
+	+ commit 23c5fccec2d89715db9c1d2a4031471572c7ccbe
+	* lang/cpp/src/key.h (enum Subkey::PubkeyAlgo): Add AlgoKyber with
+	same value as GPGME_PK_KYBER.
+
+2024-10-23  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Put attributes before declarations.
+	+ commit 32f67e8a2eb8c06156d2cda02f7820e08ea7f1fb
+	* lang/cpp/src/key.h (UserID::Signature::Notation): Move
+	GPGMEPP_DEPRECATED before the whole typedef declaration.
+	* lang/cpp/src/verificationresult.h (Signature::Notation): Ditto.
+
+	cpp: Add/change some includes.
+	+ commit c05e55bc2f320e662ca3c97ec76c7fd6fc4b0e3e
+	* lang/cpp/src/gpgaddexistingsubkeyeditinteractor.h,
+	lang/cpp/src/gpgrevokekeyeditinteractor.h: Include <string>.
+	* lang/cpp/src/key.h: Include <ctime> instead of <sys/time.h>.
+
+2024-10-21  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for new flag fields beta_compliance.
+	+ commit 92227ece77d88913aedcfc9935811ba690fd530d
+	* lang/cpp/src/decryptionresult.cpp, lang/cpp/src/decryptionresult.h
+	(class DecryptionResult): Add method isBetaCompliance.
+	* lang/cpp/src/decryptionresult.cpp (operator<<): Add new flag.
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h (class Key): Add method
+	isBetaCompliance.
+	(class Subkey): Add method isBetaCompliance.
+	* lang/cpp/src/key.cpp:
+	(Key::isDeVs): Remove duplicate check of is_de_vs of first subkey.
+	(operator<<): Add new flag.
+	* lang/cpp/src/verificationresult.cpp, lang/cpp/src/verificationresult.h
+	(class Signature): Add method isBetaCompliance.
+	* lang/cpp/src/verificationresult.cpp (operator<<): Add new flag.
+
+2024-08-29  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add pkgconfig file for gpgmepp.
+	+ commit d2d410081da79a99c4d05e17232a8eb939fda9f6
+	* configure.ac: Add substitutions GPGMEPP_PKGCONFIG_LIBS,
+	GPGMEPP_PKGCONFIG_CFLAGS, GPGMEPP_PKGCONFIG_HOST. Apply them. Configure
+	gpgmepp.pc file.
+	* lang/cpp/src/Makefile.am (pkgconfigdir, pkgconfig_DATA): New.
+	(EXTRA_DIST): Add gpgmepp.pc.in.
+	* lang/cpp/src/gpgmepp.pc.in: New.
+
+2024-08-28  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Go with default answer on unknown question by key edit interface.
+	+ commit 1f95cc1fa69d2c2e58f7518460b7130216d81331
+	* lang/cpp/src/editinteractor.cpp (edit_interactor_callback_impl):
+	Send empty string to edit interface if General Error occurred.
+
+2024-08-06  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for setting owner trust and for disabling keys.
+	+ commit 626d2c2ee9dbad940aa57be30acd9c7bde3e9229
+	* lang/cpp/src/context.cpp, lang/cpp/src/context.h (class Context): Add
+	member functions setOwnerTrust, startSetOwnerTrust, setKeyEnabled,
+	startSetKeyEnabled.
+	* lang/cpp/src/context.cpp (owner_trust_to_string): New.
+
+2024-07-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build,cpp: Fix include paths in forwarding headers in gpgme++ folder.
+	+ commit 00433ef231e405fd6c7416aa5b087f8adfa776d8
+	* lang/cpp/src/Makefile.am (build rule for copied headers): Write
+	abs_srcdir instead of srcdir in the generated headers.
+
+2024-07-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Deprecate Error::asString and update users.
+	+ commit c5d0e390133f6efb011a6cd7b0ed3c0c63e01e7b
+	* lang/cpp/src/error.h (Error::asString): Mark as deprecated.
+	* lang/cpp/src/context.cpp (operator<<),
+	lang/cpp/src/editinteractor.cpp (edit_interactor_callback_impl),
+	lang/cpp/tests/run-getkey.cpp (main),
+	lang/cpp/tests/run-keylist.cpp (main),
+	lang/cpp/tests/run-wkdlookup.cpp (main): Use Error::asStdString instead
+	of Error::asString.
+
+	cpp: Add safer member function returning text describing an error.
+	+ commit 21ff2e210c34959ba410e66e8874d43150494d45
+	* lang/cpp/src/error.h, lang/cpp/src/context.cpp (class Error): New
+	member function asStdString.
+
+	build,cpp: Create forwarding headers in a gpgme++ folder.
+	+ commit 2d3499295edf1f6ef9aa2c1330735ee022ad9bea
+	* lang/cpp/src/Makefile.am (copied_headers): New.
+	(build rule for all copied headers): New.
+	(BUILT_SOURCES): New.
+	(CLEANFILES): Add copied_headers.
+
+2024-06-28  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Remove obsolete files.
+	+ commit bc0693c200cbb56997e5f864b9fbb678dffab88b
+	* lang/cpp/src/context_glib.cpp, lang/cpp/src/context_qt.cpp: Remove.
+
+2024-06-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Remove commented out and disabled code.
+	+ commit e7b9c5f5b5caefcade1574f9413f6fd7f73e6417
+	* lang/cpp/src/configuration.cpp: Remove disabled, abandoned code.
+	* lang/cpp/src/context.cpp: Remove commented out, obsolete code.
+
+2024-05-24  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix includes in public headers.
+	+ commit 0b867d8336a1c9199af8e2935c0fc57f6df4c04f
+	* lang/cpp/src/defaultassuantransaction.h,
+	lang/cpp/src/gpgadduserideditinteractor.h,
+	lang/cpp/src/gpgagentgetinfoassuantransaction.h,
+	lang/cpp/src/gpggencardkeyinteractor.h,
+	lang/cpp/src/gpgsetexpirytimeeditinteractor.h,
+	lang/cpp/src/gpgsetownertrusteditinteractor.h,
+	lang/cpp/src/gpgsignkeyeditinteractor.h,
+	lang/cpp/src/interfaces/assuantransaction.h,
+	lang/cpp/src/interfaces/dataprovider.h,
+	lang/cpp/src/interfaces/statusconsumer.h,
+	lang/cpp/src/scdgetinfoassuantransaction.h,
+	lang/cpp/src/statusconsumerassuantransaction.h,
+	lang/cpp/src/trustitem.h: Use #include "foo.h" instead of
+	#include <foo.h> for own headers.
+
+2024-05-22  Tobias Fella  <tobias.fella@gnupg.com>
+
+	qt,cpp: Implement adding ADSKs to existing keys.
+	+ commit c906985ff29d9311676a24eb1a2887e8f725c409
+	* lang/cpp/src/context.cpp: Add functions for adding ADSKs.
+	* lang/cpp/src/context.h: Ditto.
+	* lang/qt/src/qgpgmequickjob.cpp: Add implementation of ADSK job.
+	* lang/qt/src/qgpgmequickjob.h: Ditto.
+	* lang/qt/src/quickjob.h: Add job for adding ADSKs.
+
+2024-05-21  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add information about revocation keys to Key.
+	+ commit 25663892aa418ecca2262b253dfc313dab79b20c
+	* lang/cpp/src/gpgmefw.h (gpgme_revocation_key_t): New forward
+	declaration.
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h (class Key): New methods
+	revocationKey, numRevocationKeys, revocationKeys.
+	(class RevocationKey): New.
+	(swap): New overload for RevocationKey.
+	(operator<<): New overload for RevocationKey.
+	* lang/cpp/src/key.cpp (operator<<): Add information about revocation
+	keys to the output stream for Key.
+
+	* lang/cpp/tests/run-keylist.cpp (main): Don't output Key if nextKey
+	failed, e.g. at the end of the key listing.
+
+2024-04-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Handle smart card op failure status messages.
+	+ commit 7aea45397eabc2059349928eacf806a0866b3e45
+	* lang/cpp/src/editinteractor.cpp (parse_sc_op_failure): New.
+	(CallbackHelper::edit_interactor_callback_impl): Parse failure code on
+	GPGME_STATUS_SC_OP_FAILURE status.
+	(sc_op_failure_to_error): New.
+
+2024-01-09  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp,tests: Launch dirmngr with gpg-conf.
+	+ commit 56cba989a9db929d86520e431089d3327aa97a3d
+	* lang/cpp/tests/run-wkdlookup.cpp (main): Replace backslashes with
+	forward slashes in homedir returned by GpgME::dirInfo. Use "gpgconf
+	--launch dirmngr" to start dirmngr.
+
+2023-12-19  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support new flags for direct signing/encryption of files.
+	+ commit c5177d3bcb4a53807c2c6a91267f45ddf50dbe98
+	* lang/cpp/src/context.h (enum EncryptionFlags): Add constant
+	EncryptFile.
+	* lang/cpp/src/global.h (enum SignatureMode): Add constant SignFile.
+	* lang/cpp/src/context.cpp (sigflags2sigflags): Handle new flag
+	SignFile.
+	(encryptflags2encryptflags): Handle new flag EncryptFile.
+	(operator<<): Add new flags to the corresponding debug streams.
+	* lang/cpp/src/signingresult.cpp (CreatedSignature::mode): Handle
+	new flag SignFile (even if it cannot occur).
+
+2023-10-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support new key capability flags.
+	+ commit 5700f00f642b7b3fa3e5cc5a2948a8c474f1ad34
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h (class Key): New methods
+	hasCertify, hasSign, hasEncrypt, hasAuthenticate.
+
+2023-08-04  Carl Schwan  <carl.schwan@gnupg.com>
+
+	cpp: Expose gpgme_decrypt_result_t.is_mime through cpp API.
+	+ commit 1cfad17ddafb6742ea85b092d6b59cf823c3caaf
+	* lang/cpp/src/descriptionresult.cpp (DescriptionResult::isMime): New.
+	* lang/cpp/src/descriptionresult.h: Update accordingly.
+
+2023-06-16  Andre Heinecke  <aheinecke@gnupg.org>
+
+	qt, cpp: Support larger size-hint on 32 bit builds.
+	+ commit e3eb5afe13a920b6aeb0a28d0d3e7b9ad2dc4e28
+	* NEWS: Mention this.
+	* lang/cpp/src/data.h, lang/cpp/src/data.cpp (Data::setSizeHint): New.
+	* lang/qt/src/qgpgmedecryptjob.cpp,
+	 lang/qt/src/qgpgmedecryptverifyarchivejob.cpp,
+	 lang/qt/src/qgpgmedecryptverifyjob.cpp,
+	 lang/qt/src/qgpgmeencryptjob.cpp,
+	 lang/qt/src/qgpgmesignencryptjob.cpp,
+	 lang/qt/src/qgpgmesignjob.cpp,
+	 lang/qt/src/qgpgmeverifydetachedjob.cpp,
+	 lang/qt/src/qgpgmeverifyopaquejob.cpp: Set size for input IODevice.
+
+	cpp: Expose gpgme_data_set_flag through cpp API.
+	+ commit 5fee1b6846d83fbaaad60ff57ead617ab7a4e45c
+	* lang/cpp/src/data.cpp (Data::setFlag): New.
+	* lang/cpp/src/data.h: Update accordingly.
+	* NEWS: Mention this.
+
+2023-06-01  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	doc,cpp: Treat GPG_ERR_FULLY_CANCELED as canceled.
+	+ commit b729775584ffd77ef6293c29d04af7859d62e8d5
+	* doc/gpgme.texi (GPG_ERR_FULLY_CANCELED): New.
+	* lang/cpp/src/context.cpp (Error::isCanceled): Also return true for
+	GPG_ERR_FULLY_CANCELED.
+
+2023-05-30  Biswapriyo Nath  <nathbappai@gmail.com>
+
+	cpp,python: Respect --disable-gpg-test for tests.
+	+ commit 9d39389ac9230f0e73eb88d4604b8d4fca294b9b
+	lang/cpp/Makefile.am (SUBDIRS): Depend tests in RUN_GPG_TESTS.
+	lang/python/Makefile.am (SUBDIRS): Ditto.
+
+2023-04-18  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix Key::canSign()
+	+ commit eb7817ab7617e1f3615e47b03d2a9526a4767839
+	* lang/cpp/src/key.h (canReallySign): Deprecate.
+	* lang/cpp/src/key.cpp (canSign): Remove workaround. Use implementation
+	of canReallySign.
+	(canReallySign): Use canSign().
+	(operator<<): Use canSign().
+
+2023-03-21  Werner Koch  <wk@gnupg.org>
+
+	core,cpp: Add new key flags to gpgme_subkey_t.
+	+ commit bd97412bd89ad3443881be6b0f1a0198973947c2
+	* src/gpgme.h.in (struct _gpgme_subkey): Add bit flags can_renc,
+	can_timestamp, adn is_group_owned. Reduce size of _unused.
+	* src/keylist.c (set_subkey_capability): Set them.
+	* tests/run-keylist.c (main): Print them.
+
+	* lang/cpp/src/key.h (Subkey::canRenc): New.
+	(Subkey::canTimestamp): New.
+	(Subkey::isGroupOwned): New.
+	* lang/cpp/src/key.cpp: Implement new methods.
+	(Subkey::isQualified): Print them.
+	(std::ostream &operator<<): Print them.
+
+2023-02-09  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Improve debug output of some enums.
+	+ commit 1031bf62065181d7df5c2093f1ef44d27b5d33bb
+	* lang/cpp/src/verificationresult.cpp (operator<<): Fix output of
+	Signature::PKAStatus which doesn't represent flags. Print corresponding
+	name of enum value if Signature::Summary or Notation::Flags are 0.
+
+2023-02-02  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Return successful verification for signed but not encrypted data.
+	+ commit 3ce1385f5207ec2f424264f30c7c98f6d69cc768
+	* lang/cpp/src/context.cpp (Context::decrypt): Use decryptionResult().
+	(Context::verifyDetachedSignature, Context::verifyOpaqueSignature):
+	Use verificationResult().
+	(Context::verificationResult): Ignore "no data" error for signed but
+	not encrypted data.
+	(Context::decryptAndVerify): Use decryptionResult() and
+	verificationResult().
+
+	cpp: Update decryption flags.
+	+ commit 6a4f6aaea825058845886bdcbb94777be07840f0
+	* lang/cpp/src/context.h (DecryptArchive): New flag.
+
+	cpp: Add const-overloads of version comparison operators.
+	+ commit ad0ee84dc5734dcabf90570c3d0dc695cbb81ab6
+	* lang/cpp/src/engineinfo.h (EngineInfo::Version): Add const-overloads
+	of all comparison operators.
+
+2023-01-31  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix debug output of SignatureMode.
+	+ commit d60de32aae71573767fdec850cfb7be923d7890c
+	* lang/cpp/src/context.cpp (operator<<): Treat signature mode as
+	combination of a 2-bit flag and a 1-bit flag.
+
+2023-01-30  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support new archive signing flag.
+	+ commit 4d72304dbe4137b7e80fac7a76d98e64bbd3d476
+	* lang/cpp/src/global.h (enum SignatureMode): Add constant SignArchive.
+	* lang/cpp/src/context.cpp (sigmode2sigmode): Rename to
+	sigflags2sigflags
+	(sigflags2sigflags): ... and rename argument mode to flags and treat
+	it as flags. Adjust the callers.
+	(operator<<): Change local CHECK macro to handle flags. Add new flag
+	to debug stream.
+	* lang/cpp/src/signingresult.cpp (CreatedSignature::mode): Handle
+	new flags (even if it cannot occur currently).
+
+2023-01-27  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support new archive encryption flag.
+	+ commit c8c443a440c4bc6ce7c9325ee0b4dae28276e918
+	* lang/cpp/src/context.h (EncryptArchive): New flag.
+	* lang/cpp/src/context.cpp (encryptflags2encryptflags): Convert
+	EncryptArchive to corresponding gpgme encrypt flags.
+	(operator<<): Add new flag to debug stream.
+
+	cpp: Add convenience overload to set file name.
+	+ commit c449cd2b084b9db110c81bf2fbc9e36bb632a427
+	* lang/cpp/src/data.h, lang/cpp/src/data.cpp (setFileName): Add
+	overload.
+
+2023-01-26  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support all encryption flags.
+	+ commit 631a7b96aae3155696a0f846f7b19cab3cb3d8d0
+	* lang/cpp/src/context.h (WantAddress): New flag.
+	* lang/cpp/src/context.cpp (encryptflags2encryptflags): Convert
+	WantAddress to corresponding gpgme encrypt flags.
+	(operator<<): Add new flag to debug stream.
+
+	cpp: Pass ThrowKeyIds and EncryptWrap flags to GpgME.
+	+ commit bde2597f2117e7953731d0afd0796e49b3fecc1e
+	* lang/cpp/src/context.cpp (encryptflags2encryptflags): Convert
+	ThrowKeyIds and EncryptWrap to corresponding gpgme encrypt flags.
+	(operator<<): Add flags to debug stream.
+
+2023-01-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix comparisons of integer expressions of different signedness.
+	+ commit 73686de886886928f35efb270999a1e9228facb4
+	* lang/cpp/src/gpgrevokekeyeditinteractor.cpp
+	(GpgRevokeKeyEditInteractor::Private::nextState): Cast signed nextLine
+	value to std::size_t.
+
+	cpp: Expliticly declare compiler generated copy constructors.
+	+ commit 85fd6b872a3a8cce18d3b2edae3155b8e86f81a6
+	* lang/cpp/src/configuration.h (Component, Option),
+	lang/cpp/src/data.h (Data),
+	lang/cpp/src/decryptionresult.h (DecryptionResult,
+	DecryptionResult::Recipient),
+	lang/cpp/src/encryptionresult.h (EncryptionResult, InvalidRecipient),
+	lang/cpp/src/engineinfo.h (EngineInfo),
+	lang/cpp/src/importresult.h (ImportResult, Import),
+	lang/cpp/src/key.h (Key, Subkey, UserID, UserID::Signature),
+	lang/cpp/src/keygenerationresult.h (KeyGenerationResult),
+	lang/cpp/src/keylistresult.h (KeyListResult),
+	lang/cpp/src/notation.h (Notation),
+	lang/cpp/src/signingresult.h (SigningResult, InvalidSigningKey,
+	CreatedSignature),
+	lang/cpp/src/swdbresult.h (SwdbResult),
+	lang/cpp/src/tofuinfo.h (TofuInfo),
+	lang/cpp/src/verificationresult.h (VerificationResult, Signature),
+	lang/cpp/src/vfsmountresult.h (VfsMountResult): Explitily declare
+	compiler generated copy constructor.
+
+2022-12-08  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Handle status errors in the base edit interactor.
+	+ commit baab2bf0ea010bf329d59f453701abc573b78c24
+	* lang/cpp/src/editinteractor.cpp (edit_interactor_callback_impl):
+	Handle status errors.
+	* lang/cpp/src/gpgrevokekeyeditinteractor.cpp
+	(GpgRevokeKeyEditInteractor::Private::nextState): Remove handling of
+	status errors.
+
+	cpp: Handle statuses that need no response in the base edit interactor.
+	+ commit d48d7665bfe1b8be12ecd6d5265b8181512cea37
+	* lang/cpp/src/editinteractor.cpp (edit_interactor_callback_impl): Do
+	not call nextState() if status needs no response.
+	* lang/cpp/src/gpgaddexistingsubkeyeditinteractor.cpp
+	(GpgAddExistingSubkeyEditInteractor::Private::nextState),
+	lang/cpp/src/gpgadduserideditinteractor.cpp
+	(GpgAddUserIDEditInteractor::nextState),
+	lang/cpp/src/gpggencardkeyinteractor.cpp
+	(GpgGenCardKeyInteractor::nextState),
+	lang/cpp/src/gpgrevokekeyeditinteractor.cpp
+	(GpgRevokeKeyEditInteractor::Private::nextState),
+	lang/cpp/src/gpgsetexpirytimeeditinteractor.cpp
+	(GpgSetExpiryTimeEditInteractor::nextState),
+	lang/cpp/src/gpgsetownertrusteditinteractor.cpp
+	(GpgSetOwnerTrustEditInteractor::nextState),
+	lang/cpp/src/gpgsignkeyeditinteractor.cpp
+	(GpgSignKeyEditInteractor::nextState): Remove handling of statuses that
+	need no response.
+
+2022-10-24  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Allow setting the curve to use when generating ECC keys.
+	+ commit 7440649171ef35d9035b8cd64a0f8681215ad174
+	lang/cpp/src/gpggencardkeyinteractor.h (class GpgGenCardKeyInteractor):
+	Add enum Curve. Add member function setCurve.
+	lang/cpp/src/gpggencardkeyinteractor.cpp
+	(class GpgGenCardKeyInteractor::Private): Initialize simple members
+	in-class. Add member curve.
+	(GpgGenCardKeyInteractor::~GpgGenCardKeyInteractor): Use default d'tor.
+	(GpgGenCardKeyInteractor::setCurve): New.
+	(GpgGenCardKeyInteractor::action): Return curve defaulting to
+	Curve25519.
+
+2022-09-14  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Reject signing expired keys.
+	+ commit 018a9c41f68cfa20e40e78d31d59834212ce2cd7
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp (enum SignKeyState): Add
+	new state REJECT_SIGN_EXPIRED.
+	(makeTable): Add entries for new state to transition map.
+	(GpgSignKeyEditInteractor::action): Handle new state.
+
+2022-08-19  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix building with C++11.
+	+ commit eaf5b2be86191d932c747b7ad95f7c870ac2d1a6
+	* lang/cpp/src/importresult.cpp (ImportResult::mergeWith): Replace
+	'auto' in lambdas with the actual type.
+
+2022-08-18  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Fix handling of "no key" or "invalid time" situations.
+	+ commit 6a6ad6cacd6ab96ae60233c4f7cc849adabf60ac
+	* lang/cpp/src/gpgaddexistingsubkeyeditinteractor.cpp
+	(GpgAddExistingSubkeyEditInteractor::Private::nextState): Fix inverted
+	logic of string comparisons.
+
+2022-08-09  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for gpgme_op_set_uid_flag.
+	+ commit 0e90d1e85630f604d8b379edf5f53c32cf6590db
+	* lang/cpp/src/context.cpp, lang/cpp/src/context.h
+	(Context::setPrimaryUid, Context::startSetPrimaryUid): New.
+
+2022-06-30  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Remove obsolete compatibility with KF5 variants.
+	+ commit e72739389acfc897e2cd4ff8bff545dcfeb08b1f
+	* lang/cpp/src/GpgmeppConfig-w32.cmake.in.in,
+	lang/cpp/src/GpgmeppConfig.cmake.in.in: Remove find_package() call.
+
+2022-05-12  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Export KeyListModeSaver.
+	+ commit 897f4832d5e753c22c5d46f73963f8b9227ca5ca
+	* lang/cpp/src/context.h (Context::KeyListModeSaver): Add Export.
+
+2022-05-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Output more properties of a subkey.
+	+ commit 1b9234393e2d39fa5dd1cbd531554d7acc552e2d
+	* lang/cpp/src/key.cpp (ostream operator<< for Subkey): Fix wrong output
+	of isInvalid and isDisabled flags. Add output of key grip, card serial
+	number and the flags isSecret, isQualified, isDeVs, and isCardKey.
+
+	cpp,tests: Actually parse the --with-secret option.
+	+ commit df6b0682f53818b07ec5bad62114346f50c8026a
+	* lang/cpp/tests/run-keylist.cpp (main): Handle --with-secret option.
+	Print error for unknown option.
+
+2022-05-04  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Allow retrieving import result of key listing with locate mode.
+	+ commit ddf660eb5e15e7defe4fd0b60a770deb087b3e83
+	* lang/cpp/src/context_p.h (enum Context::Private::Operation): Add
+	value KeyListWithImport.
+	* lang/cpp/src/context.cpp (Context::startKeyListing, Context::nextKey):
+	Set lastop to KeyListWithImport if keylist mode includes Locate.
+
+	cpp: Allow merging the results of two imports.
+	+ commit 036686b8a7706335b58df50409b95acb383bdec1
+	* lang/cpp/src/importresult.h, lang/cpp/src/importresult.cpp (class
+	ImportResult): Add member function mergeWith.
+
+2022-05-02  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add RAII class for saving/restoring the key list mode.
+	+ commit 3c03beb2f86d5b39b260b8a25b5bfea1c291843d
+	* lang/cpp/src/context.h, lang/cpp/src/context.cpp (class Context):
+	Add nested class KeyListModeSaver.
+
+2022-04-28  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp,tests: Verify that requested keylist mode is used.
+	+ commit 46f959b3e0d42a44862c81cff67dea831412891e
+	* lang/cpp/tests/run-getkey.cpp, lang/cpp/tests/run-keylist.cpp (main):
+	Check used keylist mode.
+
+2022-04-27  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Support new keylist modes.
+	+ commit 8d4dcb96ccc96d0d2b4455620c89d55daebb142d
+	* lang/cpp/src/global.h (ForceExtern, LocateExternal, KeyListModeMask):
+	New.
+	* lang/cpp/src/context.cpp (operator<<): Add check.
+	* lang/cpp/src/util.h (gpgme_keylist_mode_t,
+	convert_from_gpgme_keylist_mode_t): Handle ForceExtern.
+	* lang/cpp/tests/run-getkey.cpp (show_usage, main): Add arguments
+	--force-extern and --locate-external.
+	* lang/cpp/tests/run-keylist.cpp (show_usage, main): Ditto.
+
+2022-04-22  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Allow changing the error of a result.
+	+ commit cd9738e8be499c3275a46b95bd92f00bc9cbf403
+	* lang/cpp/src/result.h (class Result): Add member function setError.
+
+2022-04-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Handle canceling of an edit operation.
+	+ commit 1691f35125b3f2651efc72e8a8f2cec777ca55af
+	* lang/cpp/src/editinteractor.cpp
+	(CallbackHelper::edit_interactor_callback_impl): Check for error _or_
+	canceled state.
+
+	cpp: Return actual error if revocation fails.
+	+ commit 9ee87441078465b60c7430102e64085d557ab6e1
+	* lang/cpp/src/editinteractor.cpp, lang/cpp/src/editinteractor.h
+	(EditInteractor::parseStatusError): New.
+	* lang/cpp/src/gpgrevokekeyeditinteractor.cpp
+	(GpgRevokeKeyEditInteractor::Private::nextState): Handle status
+	error.
+
+	cpp: Add internal utility function for splitting strings.
+	+ commit d54d078dfe5ffbac790a2559ba7ff474cafe278b
+	* lang/cpp/src/util.h (split): New.
+
+	cpp: Do not export symbols of the Private class.
+	+ commit 807224b66d5343bd4b255235dd90a9efd2c11732
+	* lang/cpp/src/gpgrevokekeyeditinteractor.h (class
+	GpgRevokeKeyEditInteractor): Mark nested class Private as hidden.
+
+2022-03-30  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add interactor to revoke a key.
+	+ commit 99e0c016138dba9ff69305ce197f360f616fe9bf
+	* lang/cpp/src/global.h (enum class RevocationReason): New.
+	* lang/cpp/src/gpgrevokekeyeditinteractor.cpp,
+	lang/cpp/src/gpgrevokekeyeditinteractor.h: New.
+	* lang/cpp/src/Makefile.am: Add new files.
+
+2022-03-28  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Set default visibility of all symbols to hidden.
+	+ commit 0d77fecdc2f1788626b5acde36f9a4905b5d45e2
+	* configure.ac: Add -fvisibility=hidden to GPGME_CPP_CFLAGS if gcc
+	supports the flag.
+	* lang/cpp/src/Makefile.am (AM_CPPFLAGS): Add GPGME_CPP_CFLAGS.
+	* m4/ax_gcc_func_attribute.m4: New.
+
+	cpp: Put local helper function into unnamed namespace.
+	+ commit 6b164183ccf11570d7c11c12aaaa131313b5a26f
+	lang/cpp/src/context.cpp (to_auditlog_flags): Wrap in unnamed namespace.
+
+2022-02-03  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Allow import of keys given by key ids.
+	+ commit 3843f98f2a5d8169c0e0455dea4ed989d8170214
+	* lang/cpp/src/context.h (class Context): Add overloads of member
+	functions importKeys and startKeyImport
+	* lang/cpp/src/context.cpp (class Context): ... and implement them.
+
+	cpp: Add internal adapter for passing a vector of strings to gpgme.
+	+ commit 35bc09378a0794b9f835769acf0942de27973350
+	* lang/cpp/src/util.h (class StringsToCStrings): New.
+	* lang/cpp/src/util.cpp: New.
+	* lang/cpp/src/Makefile.am: Add new file.
+
+2022-01-12  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add interactor to add existing subkeys to other keys.
+	+ commit d4717811be11f73a35a1f73739b0fe602403e031
+	* lang/cpp/src/gpgaddexistingsubkeyeditinteractor.cpp,
+	lang/cpp/src/gpgaddexistingsubkeyeditinteractor.h: New.
+	* lang/cpp/src/Makefile.am: Add new files.
+
+2022-01-04  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Allow export of secret subkeys.
+	+ commit d86a351f83d5e9dac05fa34d25444c0579a71229
+	* lang/cpp/src/context.h (enum Context::ExportMode): Add value
+	ExportSecretSubkey.
+	(class Context): Add member functions exportSecretSubkeys and
+	startSecretSubkeyExport.
+	* lang/cpp/src/context.cpp (Context::exportPublicKeys,
+	Context::startPublicKeyExport): Return error if ExportSecretSubkey
+	mode flag is set.
+	(Context::exportSecretSubkeys, Context::startSecretSubkeyExport):
+	Implement.
+
+	cpp: Allow export of secret keys.
+	+ commit 7efc67248d8470c8108442fe599a21972308e9fc
+	* lang/cpp/src/context.h (class Context): New member functions
+	exportSecretKeys, startSecretKeyExport, exportKeys, startKeyExport.
+	(Context::exportPublicKeys, Context::startPublicKeyExport): Rename
+	argument flags/export_mode to mode.
+	* lang/cpp/src/context.cpp (Context::exportPublicKeys): Return error if
+	ExportSecret mode flag is set. Call exportKeys().
+	(Context::startPublicKeyExport): Return error if
+	ExportSecret mode flag is set. Call startKeyExport().
+	(Context::exportSecretKeys, Context::startSecretKeyExport,
+	Context::exportKeys, Context::startKeyExport): Implement.
+
+	cpp: Mark ExportNoUID flag as obsolete.
+	+ commit 7b853524f1a69a3450ad0490ed16114d5c4914e6
+	* lang/cpp/src/context.h (enum Context::ExportMode): Mark value
+	ExportNoUID as obsolete
+
+	cpp: Remove obsolete workaround.
+	+ commit eb679d6e8d2db12c1092323be567f7d8f15fbbfe
+	* lang/cpp/src/context.cpp (Context::startKeyListing,
+	Context::exportPublicKeys, Context::startPublicKeyExport): Remove
+	workaround.
+
+2021-12-22  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Check fpr of import status for NULL.
+	+ commit 7dc20216c964d8925ba66b406b01089feaeb05c0
+	* lang/cpp/src/importresult.cpp (GpgME::ImportResult::Private): Check
+	fpr for NULL.
+
+2021-12-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp,tests: Add test runner for doing a WKD lookup without import.
+	+ commit 30be7f795c2627df8b08f2ee4e1b5f7338790664
+	* lang/cpp/tests/Makefile.am (run_wkdlookup_SOURCES, programs_unix):
+	New.
+	(noinst_PROGRAMS): Add $(programs_unix).
+	* lang/cpp/tests/run-wkdlookup.cpp: New.
+
+	cpp: Add new supported components to API docs of dirInfo()
+	+ commit a67b4d1618e99e19ae0ffb41c35dcc391ee423a0
+	lang/cpp/src/global.h: Update API doc of dirInfo().
+
+2021-12-07  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Return engine info for engine used by the context.
+	+ commit aacaead73612fd173b60875be1191c54b723e477
+	lang/cpp/src/context.cpp (Context::engineInfo()): Return engine info
+	for protocol of context.
+
+	cpp: Factor out common code of GpgME::engineInfo() overloads.
+	+ commit d68e6f7aa2a79d444db576e6af7ea79f857dc38e
+	* lang/cpp/src/context.cpp (get_engine_info, get_static_engine_info):
+	New.
+	(GpgME::engineInfo(GpgME::Protocol), GpgME::engineInfo(GpgME::Engine)):
+	Use get_static_engine_info().
+
+2021-11-25  Werner Koch  <wk@gnupg.org>
+
+	core: Support dirinfo("socketdir")
+	+ commit 7e10acc1ecd279709384bb360e589e061f09aed8
+	* src/dirinfo.c (WANT_SOCKETDIR): New.
+	(dirinfo): Add field socketdir.
+	(parse_output): Support "socketdir".
+	(get_gpgconf_item): Return socketdir.
+
+	* tests/t-engine-info.c (main): Add socketdir to the output.
+
+	* src/w32-util.c (_gpgme_create_process_utf8): Fix indentation.
+
+2021-05-06  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Do not close stdout/stderr when destroying EditInteractor.
+	+ commit d7044eeec1b368ed53c5119d8ef7785aedd54a4f
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::Private): Initialize
+	members 'state' and 'debug' in-class. Add member 'debugNeedsClosing'.
+	(EditInteractor::Private::Private): Remove members initializers.
+	Remember if 'debug' needs to be closed.
+	(EditInteractor::Private::~Private): Only close 'debug' if it needs to
+	be closed.
+
+2021-05-05  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for trust signatures to sign key edit interactor.
+	+ commit 668184ff53bbb2ee0f72478ca76fb674757dd49a
+	* lang/cpp/src/gpgsignkeyeditinteractor.h,
+	lang/cpp/src/gpgsignkeyeditinteractor.cpp
+	(GpgSignKeyEditInteractor::setTrustSignatureTrust): New.
+	(GpgSignKeyEditInteractor::setTrustSignatureDepth): New.
+	(GpgSignKeyEditInteractor::setTrustSignatureScope): New.
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp
+	(GpgSignKeyEditInteractor::Private::Private): Initialize new member.
+	(makeTable): Add new transition. Fix typos in existing transitions.
+	(GpgSignKeyEditInteractor::action): Handle SET_TRUST_VALUE,
+	SET_TRUST_DEPTH, and SET_TRUST_REGEXP.
+
+	cpp: Add getters for the attributes of a trust signature.
+	+ commit 14a1f05a8e604b5f83ee72fd03b387c962f31d93
+	* lang/cpp/src/key.h (TrustSignatureTrust): New enum.
+	* lang/cpp/src/key.h, lang/cpp/src/key.cpp
+	(UserID::Signature::isTrustSignature): New.
+	(UserID::Signature::trustValue): New.
+	(UserID::Signature::trustDepth): New.
+	(UserID::Signature::trustScope): New.
+
+2021-01-04  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add const-overload of UserID::Signature::operator<
+	+ commit f644b64400284236ad3a3b2244a2a3c562f731ba
+	lang/cpp/src/key.h, lang/cpp/src/key.cpp (UserID::Signature::operator<):
+	Add const-overload. Deprecate non-const overload.
+
+2020-11-20  Andre Heinecke  <aheinecke@gnupg.org>
+
+	Revert "cpp: Use portable off_t size_t"
+	+ commit 02d885a9c380d922c37748fc27f01e900dbfeb74
+	This reverts commit adb872f2084a7940391a0de03ac73799db5f5808.
+
+2020-11-18  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Use portable off_t size_t.
+	+ commit adb872f2084a7940391a0de03ac73799db5f5808
+	* configure.ac: Configure cpp data.h.in
+	* lang/cpp/src/Makefile.am: Generate data.h
+	* lang/cpp/src/data.cpp, lang/cpp/src/data.h: Use portable
+	types.
+	* lang/qt/src/Makefile.am: Include build dir.
+	* lang/qt/tests/makefile.am: Include build dir.
+
+2020-11-03  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Mark helper functions as static.
+	+ commit 05494d323d2dc226085bdbfc690081d3accdf5ea
+	lang/cpp/src/key.cpp (find_subkey, verify_subkey, find_uid, verify_uid,
+	find_signature, verify_signature): Mark as static.
+
+	cpp: Make signatures belonging to the same user ID sortable.
+	+ commit 4ee60425914f7a6d092fd800057599d954b4244a
+	lang/cpp/src/key.h, lang/cpp/src/key.cpp (UserID::Signature::operator<):
+	New.
+	lang/cpp/src/key.cpp (signature_index): New.
+
+2020-10-29  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for gpgme_op_revsig.
+	+ commit de844dcf97f49a51e22f31e75609003b247c7e7d
+	* lang/cpp/src/context.cpp, lang/cpp/src/context.h
+	(Context::revokeSignature, Context::startRevokeSignature): New.
+	* lang/cpp/src/context.cpp
+	(getLFSeparatedListOfStrings, getLFSeparatedListOfUserIds): New.
+	(getLFSeparatedListOfFingerprintsFromSubkeys): Extracted second part
+	of function to getLFSeparatedListOfStrings.
+
+2020-10-23  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for gpgme_cancel.
+	+ commit 5605fb9ba174e3e41f0b1a4fa75fe0586a27ab03
+	* lang/cpp/src/context.cpp, lang/cpp/context.h
+	(Context::cancelPendingOperationImmediately): New.
+	* NEWS: Mention added API
+
+	Add Assuan transaction that forwards status lines to another object.
+	+ commit c9a86494090eb1ce8fa70c819d7d85643cc036a0
+	* lang/cpp/src/Makefile.am: Add new files.
+	* lang/cpp/src/interfaces/statusconsumer.h,
+	lang/cpp/src/statusconsumerassuantransaction.cpp,
+	lang/cpp/src/statusconsumerassuantransaction.h: New.
+	* NEWS: Mention new API.
+
+	cpp, qt: Add missing comparison operators for version info comparison.
+	+ commit 4886d6e43b85b96683fa1cf443ffb8be203dc6e0
+	* lang/cpp/src/engineinfo.h (EngineInfo::Version::operator<=,
+	EngineInfo::Version::operator>=, EngineInfo::Version::operator!=):
+	New.
+	* lang/qt/tests/t-various.cpp (TestVarious::testVersion): Add tests for
+	new comparison operators.
+	* NEWS: Mention added API
+
+	cpp, qt: Fix version info comparison.
+	+ commit e6fbef3e41a6f831827f5ad5cf5b20eb05716ae1
+	* lang/cpp/src/engineinfo.h
+	(EngineInfo::Version::operator>(const Version &)): Fix logic.
+	(EngineInfo::Version::operator>(const char *)): Use Version-overload of
+	operator>.
+
+	* lang/qt/tests/t-various.cpp: Add test.
+
+2020-09-08  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Update key with --with-secret instead of updating it twice.
+	+ commit 218ee792701000f54257f8c9aad293db22922ac4
+	* lang/cpp/src/key.cpp (Key::update): Call Context::key() only once
+	with KeyListMode::WithSecret.
+
+2020-09-07  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add keylist mode WithSecret.
+	+ commit 37e19790efc8abe0fd7cf4ae95a3637ca0327b32
+	* lang/cpp/src/global.h (WithSecret): New.
+	* lang/cpp/src/context.cpp (operator<<): Handle WithSecret.
+	* lang/cpp/src/util.h (add_to_gpgme_keylist_mode_t,
+	convert_from_gpgme_keylist_mode_t): Ditto.
+
+	cpp: Add missing keylist modes.
+	+ commit c72ad524409c5aac3c4e980cac304743f5cf3074
+	* lang/cpp/src/util.h
+	(add_to_gpgme_keylist_mode_t): Sort modes as in enum definition and
+	add missing modes to check.
+	(convert_from_gpgme_keylist_mode_t): Add missing handling of
+	GPGME_KEYLIST_MODE_WITH_TOFU and GPGME_KEYLIST_MODE_WITH_KEYGRIP.
+
+2020-09-03  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Copy some more subkey properties when merging keys.
+	+ commit b7a41505d7590e7a2b72d0a42d2068c40531ada1
+	* lang/cpp/src/key.cpp (Key::mergeWith): Also merge secret flag and
+	keygrip
+
+2020-08-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Make private helper a file static.
+	+ commit c1f8d801c5c4c99827fecb040cf75553f4bf9166
+	* lang/cpp/src/context.h, lang/cpp/src/context.cpp
+	(Context::getLFSeparatedListOfFingerprintsFromSubkeys): Remove
+	from Context; make it a static function instead
+
+2020-08-06  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Use cstdlib getenv for portability.
+	+ commit 452abd91e79a46815189fc0a6554d44ec31c3790
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::Private::Private):
+	Use std::getenv.
+
+2020-08-04  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	cpp: Add support for gpgme_op_setexpire.
+	+ commit 6628c43dd569b8a1f596340492c5c8b1ce7ab88d
+	* lang/cpp/src/context.cpp
+	(Context::setExpire, Context::startSetExpire): New.
+	(Context::getLFSeparatedListOfFingerprintsFromSubkeys):
+	New helper.
+	* lang/cpp/src/context.h
+	(Context::SetExpireFlags): New enum.
+	(Context::setExpire, Context::startSetExpire): Add
+	prototypes.
+	(Context::getLFSeparatedListOfFingerprintsFromSubkeys):
+	Add as private helper.
+
+	cpp: Add ostream operator for subkey.
+	+ commit 6f0ba236ff50e99a62d85e57ad769aaed5361491
+	* lang/cpp/src/key.cpp (Subkey): Add ostream operator.
+	* lang/cpp/src/key.h: Update accordingly.
+
+2020-07-16  Andre Heinecke  <aheinecke@gnupg.org>
+
+	qt, cpp: Support export modes.
+	+ commit 905246ac2d2329a9c5b967b9d702b4ca8cceeac6
+	* lang/cpp/context.cpp, lang/cpp/context.h
+	(Context::startPublicKeyExport, Context::exportPublicKeys): Extend
+	with flags paramenter.
+	(Context::ExportMode): New.
+	* lang/qt/src/exportjob.h (ExportJob::setExportMode): New.
+	* lang/qt/src/qgpgmeexportjob.cpp, lang/qt/src/qgpgmeexportjob.h:
+	Update accordingly.
+
+2020-07-15  Werner Koch  <wk@gnupg.org>
+
+	core: New keylist mode GPGME_KEYLIST_MODE_WITH_KEYGRIP.
+	+ commit d4116287dee5450af3a904fc6513153ac294c239
+	* src/gpgme.h.in (GPGME_KEYLIST_MODE_WITH_KEYGRIP): New.
+	* src/gpgme-json.c (op_keylist): New flag "keygrip".
+	* src/engine-gpg.c (gpg_keylist_build_options): Pass the options.
+
+	* lang/cpp/src/global.h (WithKeygrip): New.
+	* lang/cpp/src/context.cpp: Add check.
+	* lang/cpp/src/key.cpp (Key::update): Handle WithKeygrip.
+	* lang/cpp/src/verificationresult.cpp: Ditto.
+	* lang/cpp/src/util.h (add_to_gpgme_keylist_mode_t): Ditto.
+
+2019-12-13  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp, qt: Use uidhash to select uids for signing.
+	+ commit 34b67e1d444bc31c87345072703145319f3b579d
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp (action):
+	Use uidhash instead of number.
+	(GpgSignKeyEditInteractor::setKey): New.
+	* lang/cpp/src/gpgsignkeyeditinteractor.h: Update accordingly.
+	* lang/cpp/src/key.h, lang/cpp/src/key.cpp: Wrap uidhash.
+	* lang/qt/src/qgpgmesignkeyjob.cpp: Set the key.
+
+2019-11-04  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Add API to obtain mutliple remarks.
+	+ commit 81fe3f98dbe0ea648a2b241bd07572c2c4e21a54
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h (UserID::remarks): New.
+	* NEWS: Mention this.
+
+	cpp: Fix dupe_ok state for single uid.
+	+ commit 8c4cc1e3be0fbb6f687504075d7a0b5f4ab3e1d0
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp (makeTable):
+	Add transition from command to dupe_ok
+
+2019-11-01  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Minor optimization in remark lookup.
+	+ commit 4a7a9c84e898a0acc03ee83c459147bdd80f83a2
+	* lang/cpp/src/key.cpp (UserID::remark): Use C-API.
+
+	cpp: Fix adding duplicated sigs on multiple uids.
+	+ commit cd070af6615faff9d4a5a9202a32ddc77823a75a
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp: Add another
+	state DUPE_OK2 to allow gpg looping over all uids.
+
+	cpp: Add env var to control editinteractor debug.
+	+ commit 22bf258b8d3bfff88bee68781f6586e278d7f7de
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::Private::Private):
+	Read "GPGMEPP_INTERACTOR_DEBUG" env var.
+	(EditInteractor::Private::~Private): Close debug file.
+
+2019-10-29  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Add support for multiple keysigs in edit.
+	+ commit d4ff3a7fe37a11788f2757df76c5d144b1ff5992
+	* lang/cpp/src/gpgsignkeyeditinteractor.cpp
+	(GpgSignKeyEditInteractor::setDupeOk): New.
+	(makeTable): Add new tansitions.
+	(SignKeyState): Add DUPE_OK Status.
+	(GpgSignKeyEditInteractor::action): Handle DUPE_OK.
+	(GpgSignKeyEditInteractor::Private::Private): Carry flag.
+
+	cpp: Add convenience API to obtain remarks.
+	+ commit f778f86e9a63da9e2e7b3c4f60fdcaa8eb89cf94
+	* lang/cpp/src/key.h, lang/cpp/src/key.cpp (UserID::remark): New.
+
+2019-05-03  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Fix initialization warning.
+	+ commit b9dde4d2bc7c51d348df318ddfe969a7da03177c
+	* lanc/cpp/src/gpggencardkeyinteractor.cpp
+	(GpgGenCardKeyInteractor::Private): Fix initialization warning.
+
+2019-04-24  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Add wrapper for gpgme_set_global_flag.
+	+ commit b034016fb3b0607a17d70bd49798bd003a1bc73f
+	* lang/cpp/src/context.cpp (setGlobalFlag): New.
+	* lang/cpp/src/global.h (setGlobalFlag): Export it.
+
+2019-03-26  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Fix GenCardKeyInteractor and extend it.
+	+ commit 40c0921959190f9b25953dfb6f6bbfc1c279d66c
+	* NEWS: Mention interface change.
+	* lang/cpp/src/gpggencardkeyinteractor.cpp
+	(GpgGenCardKeyInteractor::setAlgo): New.
+	(GpgGenCardKeyInteractor::action),
+	(GpgGenCardKeyInteractor::nextState: Handle new interface.
+
+2019-03-13  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Fix Error::hasSystemError.
+	+ commit 805c463aafb968af83fd23c838496fcb30669ee3
+	* lang/cpp/src/context.cpp (Error::hasSystemError): Invert logic to
+	do what it says.
+
+2019-02-21  Andre Heinecke  <aheinecke@gnupg.org>
+
+	cpp: Add ostream operators for import result.
+	+ commit ffc336fe23baa53e241853722b337f69dba2aa0c
+	* lang/cpp/src/importresult.cpp: Add ostream operators.
+	* lang/cpp/src/importresult.h: Update accordingly.
+
+	cpp: Make GpgME::Data::toKeys really const.
+	+ commit 7557cac7c3afed1444ea3c2bce13f695a4c2002b
+	* lang/cpp/src/data.cpp (GpgME::Data::toKeys): Rewind afterards.
+
+2019-01-16  NIIBE Yutaka  <gniibe@fsij.org>
+
+	build: With LD_LIBRARY_PATH defined, use --disable-new-dtags.
+	+ commit 8880b461a48ae797f915144bb01329214ab0b157
+	* configure.ac (LDADD_FOR_TESTS_KLUDGE): New for --disable-new-dtags.
+	* tests/Makefile.am (LDADD): Use LDADD_FOR_TESTS_KLUDGE.
+	* lang/cpp/tests/Makefile.am, lang/qt/tests/Makefile.am: Likewise.
+	* tests/gpg/Makefile.am, tests/gpgsm/Makefile.am: Likewise.
+	* tests/json/Makefile.am, tests/opassuan/Makefile.am: Likewise.
+
+2018-12-03  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt,cpp: Consistently use nullptr and override.
+	+ commit 440f1c95387e79ecfd6befc5715f0563b8c6d2e4
+	* lang/cpp/src/Makefile.am, lang/qt/src/Makefile.am (AM_CPPFLAGS):
+	Add suggest-override and zero-as-null-pointer-constant warnings.
+
+	* lang/cpp/src/*, lang/qt/src/*: Consistenly use nullptr and override.
+
+2018-11-08  Daniel Kahn Gillmor  <dkg@fifthhorseman.net>
+
+	spelling: fix misspellings.
+	+ commit 652b8f3645448764ef5f24a9076f80fda86e355e
+
+
+2018-10-29  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp,tests: Add another test runner.
+	+ commit 5b53d7ea454414be010b6a218777e5ce90cd32eb
+	* lang/cpp/tests/run-verify.cpp: New.
+	* lang/cpp/tests/Makefile.am: Update accordingly.
+
+2018-10-25  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add some convenience functions.
+	+ commit 111e24f72173eacf8e9e0bcc4914d4163c6e95de
+	* lang/cpp/src/context.cpp (Context::create): New.
+	* lang/cpp/src/context.h: Update accordingly.
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h:
+	(Key::isBad, Subkey::isBad, UserID::isBad)
+	(UserID::Signature::isBad): Add shorthand for the isX checks.
+	* NEWS: Mention it.
+
+2018-10-09  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add KeyListMode::Locate.
+	+ commit 660c162e1439e8dc380ca4e07a390d17df292a8f
+	* cpp/src/global.h (KeyListMode): Add Locate.
+
+	cpp: Add first manual tests.
+	+ commit 1ce99dedbbd18b4b699b05205961bd1762233871
+	* lang/cpp/Makefile.am: Add tests subdir.
+	* lang/cpp/tests/Makefile.am: New.
+	* lang/cpp/tests/README,
+	lang/cpp/tests/run-getkey.cpp,
+	lang/cpp/tests/run-keylist.cpp: New.
+	* configure.ac: Configure tests makefile.
+
+	cpp: Initialize all gpgme_key_t's in context.
+	+ commit bd3aa0c523530079292b019eab5552c1fed45b7d
+	* lang/cpp/src/context.cpp (Context::startKeyListing),
+	(Context::keyListResult, Context::signingKeys): Initialize key.
+
+2018-08-08  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix use after free in gencardkeyinteractor.
+	+ commit a20146167cb3ef334949f1a3aab6a60703b5a198
+	* lang/cpp/src/gpggencardkeyinteractor.cpp
+	(GpgGenCardKeyInteractor::Private::keysize): Change to string.
+
+2018-07-24  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add safety checks for key update.
+	+ commit bd230dd285897a0b4b2c7f330ba0122749805c67
+	* lang/cpp/src/key.cpp (Key::update): Check that the key is
+	not NULL.
+	* lang/cpp/src/verificationresult.cpp (GpgME::Signature::key):
+	Check for fingerprint.
+
+2018-07-19  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Print origin and last update for key/uid.
+	+ commit 17b24412dcc63226dab79d8e79712d8fea0272fb
+	* lang/cpp/src/key.cpp: Print origin and last update in
+	iostream operators.
+
+2018-07-05  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add enum mapping for GPGME_AUDIT_LOG_DIAG.
+	+ commit 10e03d61d081c936650cdc50613a5120fec2db89
+	* src/context.cpp (to_auditlog_flags): Map DIAG value.
+	* src/context.h (AuditLogFlags): Add it.
+
+2018-07-04  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix memory of DecryptionResult::symkeyAlgo.
+	+ commit c03e81de39c3afde1372e2f5b4dc0c09a6def3eb
+	* lang/cpp/src/decryptionresult.cpp (Private, ~Private): strdup
+	the symkey algo.
+
+2018-06-08  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add proper gpgme_op_createkey.
+	+ commit d0c6d2d067856e33ca840249fcd2d15c8dff46eb
+	* lang/cpp/src/context.cpp, lang/cpp/src/context.h
+	(Context::createKeyEx): New.
+
+2018-06-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add gpgme_(get)set_ctx_flag.
+	+ commit 4ba2ef72c83bf9b869f56eef172a6ba4048d7640
+	* NEWS: Mention API extensions.
+	* lang/cpp/src/context.cpp, lang/cpp/src/context.h
+	(Context::setFlag, Context::getFlag): New.
+
+	cpp: Add legacy_cipher_nomdc.
+	+ commit c2a41fc3ec6089c17dc42fb7c77fe70791d83543
+	* lang/cpp/src/decryptionresult.cpp, lang/cpp/src/decryptionresult.h
+	(DecryptionResult::isLegacyCipherNoMDC): New.
+
+2018-05-29  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add gpgme_data_rewind to cpp API.
+	+ commit e693c1c0a8607e63034f93e7ffc910d188e77398
+	* lang/cpp/src/data.h, lang/cpp/src/data.cpp (Data::rewind): New.
+	* lang/qt/tests/t-various.cpp (testDataRewind): Test it.
+
+2018-05-22  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Expose sessionKey and symkeyAlgo.
+	+ commit 7e23fc54462460d5f1383a7b6354dc7c5926d878
+	* lang/cpp/decryptionresult.cpp, lang/cpp/decryptionresult.h
+	(DecryptionResult::symkeyAlgo, DecryptionResult::sessionKey): New.
+
+2018-04-19  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add origin and last_update to UserID.
+	+ commit 36183907231d3644d54251f288f16031e8422e6b
+	* NEWS: Mention it.
+	* lang/cpp/src/key.cpp, lang/cpp/src/key.h (UserID::lastUpdate),
+	(UserID::origin): New.
+	(gpgme_origin_to_pp_origin): New helper.
+
+	cpp: Add origin and last_update.
+	+ commit 5e15401ecb18083270003e447cd42195407b2ac4
+	* NEWS: mention interface change.
+	* lang/cpp/src/key.cpp (Key::origin, Key::lastUpdate): New.
+	* lang/cpp/src/key.h (Key::Origin): New enum.
+
+2018-03-15  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Expose skipped_v3_keys.
+	+ commit 5c9596f97f3e9a475bf920d201736b00cd3a4adb
+	* lang/cpp/src/importresult.cpp,
+	 lang/cpp/src/importresult.h (ImportResult::numV3KeysSkipped): New.
+
+2018-02-16  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add shorthand for key locate.
+	+ commit fc72cb19de0980a5b545a714e2d7310e05b8d5c3
+	* lang/cpp/src/key.cpp (Key::locate): New static helper.
+	* lang/cpp/src/key.h: Update accordingly.
+
+2018-02-09  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add SpawnShowWindow flag.
+	+ commit 8608fe9552311878c8ac75d78bc028ece60b6838
+	* lang/cpp/src/context.h (SpawnShowWindow): New.
+
+	cpp: Add conveniance Data::toString.
+	+ commit e62bfbd44b1333d4f0fdc38993238f348641c699
+	* lang/cpp/src/data.h, lang/cpp/src/data.cpp: Add Data::toString.
+
+2017-12-07  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix handling of lsig promotion.
+	+ commit f9d352f4610de86d7543a24a3356e7943cc7a6ad
+	* src/gpgsignkeyeditinteractor.cpp (SignKeyState): Add second
+	CONFIRM state.
+	(makeTable): Properly handle local_promote_okay.
+	(action): Handle CONFIRM2.
+
+2017-12-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Wrap create_key and create_subkey.
+	+ commit 8bdd912b74e26eeabd617f96c0bedbb99b6078b1
+	* lang/cpp/src/context.cpp,
+	lang/cpp/src/context.h (Context::startCreateKey)
+	(Context::createKey, Context::createSubkey)
+	(Context::startCreateSubkey): New.
+
+2017-09-04  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix version info comparison.
+	+ commit f1d22a9d9594b60ef77e0862d100286acd0508a9
+	* lang/cpp/src/engineinfo.h (EngineInfo::Version::operator<):
+	Fix logic.
+	* lang/cpp/src/engineinfo.h (EngineInfo::Version::operator>):
+	New.
+	* NEWS: Mention added API
+
+2017-07-26  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix Key::isDeVs for subkeys.
+	+ commit 270a8dc4e8d3fe9099d0ca36509d0396c2108afd
+	* lang/cpp/src/key.cpp (Key::isDeVs): Check all subkeys.
+
+2017-07-10  Andre Heinecke  <aheinecke@intevation.de>
+
+	Add isDeVs to ostream operator.
+	+ commit 7e99bec2765fe9c418dec1060259ce30925e6a93
+	* lang/cpp/src/decryptionresult.cpp,
+	lang/cpp/src/verificationresult.cpp: Extend ostream operator
+	to include isDeVs.
+
+2017-06-12  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix CMake config library name for GPGME.
+	+ commit 23cde2e8227a456ae8c97840e8b638f91d17ed2d
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in: The link library
+	is of course also dynamic.
+
+2017-06-01  Justus Winter  <justus@g10code.com>
+
+	Add flag 'is_de_vs' to decryption results and signatures.
+	+ commit 07c5a203d11503bd26b40c4b0d297b7165e60a25
+	* NEWS: Update.
+	* lang/cpp/src/decryptionresult.cpp (DecryptionResult::isDeVs): New
+	function.
+	* lang/cpp/src/decryptionresult.h (DecryptionResult::isDeVs): New
+	prototype.
+	* lang/cpp/src/verificationresult.cpp (Signature::isDeVs): New
+	function.
+	* lang/cpp/src/verificationresult.h (Signature::isDeVs): New
+	prototype.
+	* lang/python/src/results.py (DecryptResult): Turn field 'is_de_vs'
+	into a boolean.
+	(Signature): Likewise.
+	* src/decrypt.c (_gpgme_decrypt_status_handler): Handle the new
+	compliance status line.
+	* src/verify.c (_gpgme_verify_status_handler): Likewise.
+	* src/gpgme.h.in (gpgme_status_code_t): Add new status codes for the
+	new status lines.
+	* src/keylist.c (parse_pub_field18): Move function to 'util.h'.
+	(keylist_colon_handler): Adapt callsites.
+	* src/status-table.c (status_table): Add new status lines.
+	* src/util.h (PARSE_COMPLIANCE_FLAGS): New macro.  This used to be
+	'parse_pub_field18', but turned into a macro to make it polymorphic.
+
+2017-04-25  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt, cpp: Add additional copyright BSI notes.
+	+ commit 16c1f8b135027dfc77f95a209e6cbd9cc2ec2c31
+	* lang/cpp/Makefile.am,
+	lang/cpp/src/Makefile.am,
+	lang/cpp/src/callbacks.cpp,
+	lang/cpp/src/callbacks.h,
+	lang/cpp/src/configuration.cpp,
+	lang/cpp/src/configuration.h,
+	lang/cpp/src/context_glib.cpp,
+	lang/cpp/src/context_p.h,
+	lang/cpp/src/context_qt.cpp,
+	lang/cpp/src/context_vanilla.cpp,
+	lang/cpp/src/data_p.h,
+	lang/cpp/src/decryptionresult.cpp,
+	lang/cpp/src/decryptionresult.h,
+	lang/cpp/src/defaultassuantransaction.cpp,
+	lang/cpp/src/defaultassuantransaction.h,
+	lang/cpp/src/editinteractor.cpp,
+	lang/cpp/src/editinteractor.h,
+	lang/cpp/src/encryptionresult.cpp,
+	lang/cpp/src/encryptionresult.h,
+	lang/cpp/src/engineinfo.cpp,
+	lang/cpp/src/engineinfo.h,
+	lang/cpp/src/error.h,
+	lang/cpp/src/eventloopinteractor.cpp,
+	lang/cpp/src/eventloopinteractor.h,
+	lang/cpp/src/exception.cpp,
+	lang/cpp/src/exception.h,
+	lang/cpp/src/global.h,
+	lang/cpp/src/gpgadduserideditinteractor.cpp,
+	lang/cpp/src/gpgadduserideditinteractor.h,
+	lang/cpp/src/gpgagentgetinfoassuantransaction.cpp,
+	lang/cpp/src/gpgagentgetinfoassuantransaction.h,
+	lang/cpp/src/gpgmefw.h,
+	lang/cpp/src/gpgsetexpirytimeeditinteractor.cpp,
+	lang/cpp/src/gpgsetexpirytimeeditinteractor.h,
+	lang/cpp/src/gpgsetownertrusteditinteractor.cpp,
+	lang/cpp/src/gpgsetownertrusteditinteractor.h,
+	lang/cpp/src/gpgsignkeyeditinteractor.cpp,
+	lang/cpp/src/gpgsignkeyeditinteractor.h,
+	lang/cpp/src/importresult.cpp,
+	lang/cpp/src/importresult.h,
+	lang/cpp/src/interfaces/assuantransaction.h,
+	lang/cpp/src/interfaces/dataprovider.h,
+	lang/cpp/src/interfaces/passphraseprovider.h,
+	lang/cpp/src/interfaces/progressprovider.h,
+	lang/cpp/src/keygenerationresult.cpp,
+	lang/cpp/src/keygenerationresult.h,
+	lang/cpp/src/keylistresult.cpp,
+	lang/cpp/src/keylistresult.h,
+	lang/cpp/src/notation.h,
+	lang/cpp/src/result.h,
+	lang/cpp/src/result_p.h,
+	lang/cpp/src/scdgetinfoassuantransaction.cpp,
+	lang/cpp/src/scdgetinfoassuantransaction.h,
+	lang/cpp/src/signingresult.cpp,
+	lang/cpp/src/signingresult.h,
+	lang/cpp/src/trustitem.cpp,
+	lang/cpp/src/trustitem.h,
+	lang/cpp/src/util.h,
+	lang/cpp/src/verificationresult.cpp,
+	lang/cpp/src/verificationresult.h,
+	lang/cpp/src/vfsmountresult.cpp,
+	lang/qt/Makefile.am,
+	lang/qt/doc/Makefile.am,
+	lang/qt/src/Makefile.am,
+	lang/qt/src/defaultkeygenerationjob.h,
+	lang/qt/tests/Makefile.am: Add missing copyright.
+
+	Change copyright from Intevation to BSI.
+	+ commit 23aa55cf38514cdb22403bb24279501bc3a7e7e7
+	* lang/cpp/src/gpggencardkeyinteractor.cpp,
+	lang/cpp/src/gpggencardkeyinteractor.h,
+	lang/cpp/src/gpgmepp_export.h,
+	lang/cpp/src/swdbresult.cpp,
+	lang/cpp/src/swdbresult.h,
+	lang/cpp/src/tofuinfo.cpp,
+	lang/cpp/src/tofuinfo.h,
+	lang/qt/src/abstractimportjob.h,
+	lang/qt/src/adduseridjob.h,
+	lang/qt/src/changeexpiryjob.h,
+	lang/qt/src/changeownertrustjob.h,
+	lang/qt/src/changepasswdjob.h,
+	lang/qt/src/cryptoconfig.cpp,
+	lang/qt/src/cryptoconfig.h,
+	lang/qt/src/dataprovider.cpp,
+	lang/qt/src/dataprovider.h,
+	lang/qt/src/decryptjob.h,
+	lang/qt/src/decryptverifyjob.h,
+	lang/qt/src/deletejob.h,
+	lang/qt/src/dn.cpp,
+	lang/qt/src/dn.h,
+	lang/qt/src/downloadjob.h,
+	lang/qt/src/encryptjob.h,
+	lang/qt/src/exportjob.h,
+	lang/qt/src/hierarchicalkeylistjob.h,
+	lang/qt/src/importfromkeyserverjob.h,
+	lang/qt/src/importjob.h,
+	lang/qt/src/job.cpp,
+	lang/qt/src/job.h,
+	lang/qt/src/keyformailboxjob.h,
+	lang/qt/src/keygenerationjob.h,
+	lang/qt/src/keylistjob.h,
+	lang/qt/src/listallkeysjob.h,
+	lang/qt/src/multideletejob.h,
+	lang/qt/src/protocol.h,
+	lang/qt/src/protocol_p.h,
+	lang/qt/src/qgpgme_export.h,
+	lang/qt/src/qgpgmeadduseridjob.cpp,
+	lang/qt/src/qgpgmeadduseridjob.h,
+	lang/qt/src/qgpgmebackend.cpp,
+	lang/qt/src/qgpgmebackend.h,
+	lang/qt/src/qgpgmechangeexpiryjob.cpp,
+	lang/qt/src/qgpgmechangeexpiryjob.h,
+	lang/qt/src/qgpgmechangeownertrustjob.cpp,
+	lang/qt/src/qgpgmechangeownertrustjob.h,
+	lang/qt/src/qgpgmechangepasswdjob.cpp,
+	lang/qt/src/qgpgmechangepasswdjob.h,
+	lang/qt/src/qgpgmedecryptjob.cpp,
+	lang/qt/src/qgpgmedecryptjob.h,
+	lang/qt/src/qgpgmedecryptverifyjob.cpp,
+	lang/qt/src/qgpgmedecryptverifyjob.h,
+	lang/qt/src/qgpgmedeletejob.cpp,
+	lang/qt/src/qgpgmedeletejob.h,
+	lang/qt/src/qgpgmedownloadjob.cpp,
+	lang/qt/src/qgpgmedownloadjob.h,
+	lang/qt/src/qgpgmeencryptjob.cpp,
+	lang/qt/src/qgpgmeencryptjob.h,
+	lang/qt/src/qgpgmeexportjob.cpp,
+	lang/qt/src/qgpgmeexportjob.h,
+	lang/qt/src/qgpgmeimportfromkeyserverjob.cpp,
+	lang/qt/src/qgpgmeimportfromkeyserverjob.h,
+	lang/qt/src/qgpgmeimportjob.cpp,
+	lang/qt/src/qgpgmeimportjob.h,
+	lang/qt/src/qgpgmekeyformailboxjob.cpp,
+	lang/qt/src/qgpgmekeyformailboxjob.h,
+	lang/qt/src/qgpgmekeygenerationjob.cpp,
+	lang/qt/src/qgpgmekeygenerationjob.h,
+	lang/qt/src/qgpgmekeylistjob.cpp,
+	lang/qt/src/qgpgmekeylistjob.h,
+	lang/qt/src/qgpgmelistallkeysjob.cpp,
+	lang/qt/src/qgpgmelistallkeysjob.h,
+	lang/qt/src/qgpgmenewcryptoconfig.cpp,
+	lang/qt/src/qgpgmenewcryptoconfig.h,
+	lang/qt/src/qgpgmerefreshkeysjob.cpp,
+	lang/qt/src/qgpgmerefreshkeysjob.h,
+	lang/qt/src/qgpgmesecretkeyexportjob.cpp,
+	lang/qt/src/qgpgmesecretkeyexportjob.h,
+	lang/qt/src/qgpgmesignencryptjob.cpp,
+	lang/qt/src/qgpgmesignencryptjob.h,
+	lang/qt/src/qgpgmesignjob.cpp,
+	lang/qt/src/qgpgmesignjob.h,
+	lang/qt/src/qgpgmesignkeyjob.cpp,
+	lang/qt/src/qgpgmesignkeyjob.h,
+	lang/qt/src/qgpgmetofupolicyjob.cpp,
+	lang/qt/src/qgpgmetofupolicyjob.h,
+	lang/qt/src/qgpgmeverifydetachedjob.cpp,
+	lang/qt/src/qgpgmeverifydetachedjob.h,
+	lang/qt/src/qgpgmeverifyopaquejob.cpp,
+	lang/qt/src/qgpgmeverifyopaquejob.h,
+	lang/qt/src/qgpgmewkspublishjob.cpp,
+	lang/qt/src/qgpgmewkspublishjob.h,
+	lang/qt/src/refreshkeysjob.h,
+	lang/qt/src/signencryptjob.h,
+	lang/qt/src/signjob.h,
+	lang/qt/src/signkeyjob.h,
+	lang/qt/src/specialjob.h,
+	lang/qt/src/threadedjobmixin.cpp,
+	lang/qt/src/threadedjobmixin.h,
+	lang/qt/src/tofupolicyjob.h,
+	lang/qt/src/verifydetachedjob.h,
+	lang/qt/src/verifyopaquejob.h,
+	lang/qt/src/wkspublishjob.h,
+	lang/qt/tests/run-keyformailboxjob.cpp,
+	lang/qt/tests/t-config.cpp,
+	lang/qt/tests/t-encrypt.cpp,
+	lang/qt/tests/t-keylist.cpp,
+	lang/qt/tests/t-keylocate.cpp,
+	lang/qt/tests/t-ownertrust.cpp,
+	lang/qt/tests/t-support.cpp,
+	lang/qt/tests/t-support.h,
+	lang/qt/tests/t-tofuinfo.cpp,
+	lang/qt/tests/t-various.cpp,
+	lang/qt/tests/t-verify.cpp,
+	lang/qt/tests/t-wkspublish.cpp,
+	tests/gpg/t-encrypt-mixed.c,
+	tests/gpg/t-thread-keylist-verify.c,
+	tests/gpg/t-thread-keylist.c,
+	tests/run-decrypt.c: Change Intevation GmbH copyright to BSI.
+
+2017-03-24  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Respect decrypt flags in new functions.
+	+ commit b77b42091525d05c8d1a006a1bb9182c09f44aa7
+	* lang/cpp/src/context.cpp: Respect directly provided flags
+	in the new decrypt functions.
+
+	cpp: Use gpgme_op_decrypt_ex and add new flags.
+	+ commit 4f750fba7c3d2f2df6ef20f013a1097efdd9b894
+	* lang/cpp/src/context.cpp: New decrypt and decryptVerify functions
+	that take flags as arguments. Use new variants in old functions.
+	(Context::setDecryptionFlags): New helper.
+	(Context::Private::Private): Initialize new member.
+	* lang/cpp/src/context_p.h (Context::Private::decryptFlags): New.
+	* lang/cpp/src/context.h (Context::DecryptFlags): New enum.
+	(Context::EncryptionFlags): Extend for EncryptWrap.
+
+2017-03-22  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Wrap keylist_from_data.
+	+ commit 7edd7d4b9167cc9ffa4d0842903b7a6ac477fe44
+	* lang/cpp/data.h, lang/cpp/data.cpp (GpgME::Data::toKeys): New.
+
+2017-03-20  Werner Koch  <wk@gnupg.org>
+
+	core,cpp: New key flag 'is_de_vs'.
+	+ commit f3e6b082cd21f03634632ddfb530bb631eb38919
+	* src/gpgme.h.in (_gpgme_subkey): New flag is_de_vs.
+	* tests/run-keylist.c (main): Print that flag.
+	* src/keylist.c (parse_pub_field18): New.
+	(keylist_colon_handler): Parse compliance flags.
+	* lang/cpp/src/key.cpp (Key::isDeVs): New.
+	(Subkey::isDeVs): New.
+
+	* lang/cpp/src/key.h (class Key): New method isDeVs.
+	(class Subkey): New method isDeVs.
+
+2017-03-02  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add subkey keygrip to API.
+	+ commit 96bdfef6487b8e727b8a21d2bdf7f3bfad1982df
+	* lang/cpp/src/key.cpp (Subkey::keyGrip): New.
+	* lang/cpp/src/key.h: Update accordingly.
+
+2017-03-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add interactor to generate keys on smartcard.
+	+ commit 94c668084c441a106ef037f8fd47474554444eb7
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::needsNoResponse):
+	Handle new states.
+	* lang/cpp/src/gpggencardkeyinteractor.cpp,
+	lang/cpp/src/gpggencardkeyinteractor.h: New.
+	* lang/cpp/src/Makefile.am: Update accordingly.
+
+2017-01-11  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add revuid and adduid support.
+	+ commit 6f466c9bbe62c191b730590fab71ec3b5d5d9fc3
+	* lang/cpp/src/context.cpp
+	(Context::revUid, Context::startRevUid),
+	(Context::addUid, Context::startAddUid): New.
+	* lang/cpp/src/context.h: Declare new functions.
+	* lang/cpp/src/key.cpp (Key::UserID::revoke)
+	(Key::addUid): Idomatic helpers.
+	lang/cpp/src/key.h: Declare new functions.
+	* NEWS: Update accordingly.
+
+	Fix cmake configuration files for MacOS.
+	+ commit 232fa28e6513f369cf6d5657b0a3199c4c178a09
+	* configure.ac: Set HAVE_MACOS_SYSTEM conditional.
+	* lang/qt/src/Makefile.am,
+	lang/cpp/src/Makefile.am,
+	lang/qt/src/QGpgmeConfig.cmake.in.in,
+	lang/cpp/src/GpgmeConfig.cmake.in.in: Use libsuffix again to
+	distinguish between macos .dylib
+
+2016-12-16  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Ensure that hasSecret is correct after update.
+	+ commit 14f877cf66d4e1f171280dd7ab4ff54a7f5892fa
+	* lang/cpp/src/key.cpp (Key::update): Check for
+	a secret key first before listing public keys.
+
+2016-12-15  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix addrSpec for keys without email.
+	+ commit be9afa267f25587d61de428a7097b48d1ef518d6
+	* lang/cpp/src/key.cpp (UserID::addrSpec): Use uid->address instead
+	of normalizing again.
+	(&operator<<(std::ostream &, const UserID &): Print it.
+
+	cpp: Fix update of partial key in verifyresult.
+	+ commit 27143a5c7085090a74d005388498ad122f1661cc
+	* lang/cpp/src/verificationresult.cpp
+	(Signature::key(bool,bool)): Don't update the returned copy
+	but the actual key of the signature.
+
+2016-11-17  Heiko Becker  <heirecka@exherbo.org>
+
+	Remove a forgotten instance of @libsuffix@
+	+ commit 2ab9d752ace1a87dee1c23ad3fefbb089e79c940
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in: Remove a forgotten
+	instance of @libsuffix@.
+
+2016-11-15  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt, cpp: Add cmake config files for w32.
+	+ commit 000376ef9377fa45eef52bc50efd68babbf8680f
+	* lang/cpp/src/GpgmeppConfig-w32.cmake.in.in
+	lang/qt/src/QGpgmeConfig-w32.cmake.in.in: New.
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in,
+	lang/qt/src/QGpgmeConfig.cmake.in.in: Remove libsuffix handling.
+	* lang/cpp/src/Makefile.am,
+	lang/qt/src/Makefile.am: Create / install w32 config files.
+	* configure.ac: Configure them.
+
+2016-11-14  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add get / set Sender API.
+	+ commit 93590ea8d75aa7e3811cb0ddf4b3d088122e20fa
+	* cpp/src/context.cpp, cpp/src/context.h (Context::setSender),
+	(Context::getSender): Add simple wrappers.
+
+	qt, cpp: Enable dll build for windows.
+	+ commit 099fdfa6878cc4d6c07438120e95966233a516d5
+	* lang/cpp/src/Makefile.am,
+	lang/qt/src/Makefile.am: Add -no-undefined to LDFLAGS.
+
+2016-11-04  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add API for swdb queries.
+	+ commit 70d3bcbeef47f1a13d81d2300c05e1f227b01a0f
+	* lang/cpp/src/swdbresult.cpp,
+	 lang/cpp/src/swdbresult.h (SwdbResult): New.
+	* lang/cpp/src/Makefile.am: Update accordingly.
+
+	cpp: Add more EngineInfo::Version ctors.
+	+ commit 8fe50c85aad498bbc692a5faea637fe6de06183a
+	* lang/cpp/src/engineinfo.h
+	(EngineInfo::Version::Version(const char*)),
+	(EngineInfo::Version::Version()): New.
+
+	cpp: Don't include gpgme.h in tofuinfo header.
+	+ commit 4ebab0de56451d8852e2720fcc195062e028d73a
+	* lang/cpp/src/tofuinfo.h: Don't include gpgme.h
+
+	cpp: Extend gpgmefw for tofuinfo and swdb query.
+	+ commit db8bc660fae50739af6bb559d5450ae69d05adf3
+	* lang/cpp/src/gpgmefw.h (gpgme_tofu_info_t)
+	(gpgme_query_swdb_result_t): New forwards.
+
+2016-11-02  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt, cpp: Fix versioning in cmake config and header.
+	+ commit 6918fbc0f037b37568688768b30de9a060cdcd4c
+	* configure.ac (VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO): New
+	subst variables for the version header.
+	* lang/cpp/src/GpgmeppConfigVersion.cmake.in,
+	lang/cpp/src/gpgmepp_version.h.in,
+	lang/qt/src/QGpgmeConfigVersion.cmake.in,
+	lang/qt/src/qgpgme_version.h.in: Use new variables.
+
+	qt, cpp: Add all generated files to cleanfiles.
+	+ commit d175f9d20681d7f99854f029a61c389b881e500f
+	* cpp/src/Makefile.am (CLEANFILES),
+	qt/src/Makefile.am (CLEANFILES): Add all generated files
+	to cleanfiles.
+
+2016-11-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt, cpp: Install version headers in subdirs.
+	+ commit 2953709e723932a12840769fa7fe128ab44a0851
+	* lang/cpp/src/Makefile.am,
+	lang/qt/src/Makefile.am: Install version headers in include
+	subdirs.
+
+2016-10-14  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Fix init of string from null.
+	+ commit 007f5ccac6133abdf33a654fb7041f83135cff0e
+	* lang/cpp/src/key.cpp (UserID::addrSpecFromString): Check return
+	value before creating the string.
+
+2016-10-13  Andre Heinecke  <aheinecke@intevation.de>
+
+	qt, cpp: Fix permissions of Config files.
+	+ commit 8ecfad56d99e69f7d9a99c0311c0cee109e24862
+	* lang/cpp/src/Makefile.am,
+	lang/qt/src/Makefile.am: Do not install config files as executable.
+
+	qt, cpp: Fix expected targets in Config files.
+	+ commit 3d2bfe3fc73dc50e9c4bcdb6a4c41b486fca6dbe
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in,
+	lang/qt/src/QGpgmeConfig.cmake.in.in: Remove KF5 variants.
+
+2016-10-11  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add API for gpgme_addrspec_from_uid.
+	+ commit db27fae86f854d0ba1829c20b7de1a10e15369ea
+	* lang/cpp/src/key.cpp (UserID::addrSpecFromString): New static
+	function to expose addrspec from uid.
+	(UserID::addrSpec): New. Get addrSpec from Userid.
+	* NEWS: Update accordingly.
+
+2016-10-10  Andre Heinecke  <aheinecke@intevation.de>
+
+	Add convenience function to get key from sig.
+	+ commit 742e7b5368a570f348b157112b69aff9ee025214
+	* lang/cpp/src/verificationresult.cpp (Signature::key(bool, bool)):
+	New. Can be used to search / update the key associcated with this
+	signature.
+
+	cpp: Return null key if the signature had no key.
+	+ commit af9c4fbc8179857b034186e9ee16201755066d29
+	* lang/cpp/src/verificationresult.cpp (Private): Add null key
+	to list when there is no key associated with the signature.
+
+2016-10-06  Justus Winter  <justus@g10code.com>
+
+	Add missing includes.
+	+ commit 92dac40b8d63d4b7bbed41a00263e17e3d00cb9b
+	* lang/cpp/src/key.cpp: Include <strings.h> for 'strcasecmp'.
+	* tests/gpg/t-cancel.c: Include <sys/select.h> for 'fd_set' and
+	friends.
+
+2016-10-05  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add support for URL Data encodings.
+	+ commit f1ecc0b629174dff3845dd122e78878086d213c2
+	* lang/cpp/src/data.h (Data::Encoding): Extend enum.
+	* lang/cpp/src/data.cpp (Data::encoding),
+	Data::setEncoding): Support new values.
+
+	cpp: Fix gcc diagnostic push / pop.
+	+ commit d411b3725a11fd145558f8d2f6ce7c2c5155e6f8
+	* lang/cpp/src/context.cpp: Fix pragmas.
+
+2016-09-29  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp, qt: Handle modified includedir installation.
+	+ commit 842e58dc66b79c5f9d598a1881344f903744f8b9
+	* lang/cpp/src/Makefile.am,
+	lang/qt/src/Makefile.am: Replace resolved_includedir.
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in,
+	lang/qt/src/QGpgmeConfig.cmake.in.in: Use resolved_includedir
+	instead of relying on a common installation prefix.
+
+2016-09-23  Daniel Kahn Gillmor  <dkg@fifthhorseman.net>
+
+	Fix spelling.
+	+ commit d29a9ba4ff4acf7bfd4b0057d8ed36421a1e19d9
+	 * lang/cpp/src/context.h, lang/qt/src/protocol.h,
+	   lang/qt/src/wkspublishjob.h, src/data-identify.c, src/engine-gpg.c:
+	   minor spelling cleanup.
+
+2016-09-23  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp, qt: Include config.h.
+	+ commit 780fbbadc92a0ea1e172e587564075c73b6b9771
+	lang/cpp/src/callbacks.cpp,
+	lang/cpp/src/configuration.cpp,
+	lang/cpp/src/context.cpp,
+	lang/cpp/src/context_glib.cpp,
+	lang/cpp/src/context_qt.cpp,
+	lang/cpp/src/context_vanilla.cpp,
+	lang/cpp/src/data.cpp,
+	lang/cpp/src/decryptionresult.cpp,
+	lang/cpp/src/defaultassuantransaction.cpp,
+	lang/cpp/src/editinteractor.cpp,
+	lang/cpp/src/encryptionresult.cpp,
+	lang/cpp/src/engineinfo.cpp,
+	lang/cpp/src/eventloopinteractor.cpp,
+	lang/cpp/src/exception.cpp,
+	lang/cpp/src/gpgadduserideditinteractor.cpp,
+	lang/cpp/src/gpgagentgetinfoassuantransaction.cpp,
+	lang/cpp/src/gpgsetexpirytimeeditinteractor.cpp,
+	lang/cpp/src/gpgsetownertrusteditinteractor.cpp,
+	lang/cpp/src/gpgsignkeyeditinteractor.cpp,
+	lang/cpp/src/importresult.cpp,
+	lang/cpp/src/key.cpp,
+	lang/cpp/src/keygenerationresult.cpp,
+	lang/cpp/src/keylistresult.cpp,
+	lang/cpp/src/scdgetinfoassuantransaction.cpp,
+	lang/cpp/src/signingresult.cpp,
+	lang/cpp/src/tofuinfo.cpp,
+	lang/cpp/src/trustitem.cpp,
+	lang/cpp/src/verificationresult.cpp,
+	lang/cpp/src/vfsmountresult.cpp,
+	lang/qt/src/dataprovider.cpp,
+	lang/qt/src/defaultkeygenerationjob.cpp,
+	lang/qt/src/gpgme_backend_debug.cpp,
+	lang/qt/src/job.cpp,
+	lang/qt/src/qgpgmeadduseridjob.cpp,
+	lang/qt/src/qgpgmebackend.cpp,
+	lang/qt/src/qgpgmechangeexpiryjob.cpp,
+	lang/qt/src/qgpgmechangeownertrustjob.cpp,
+	lang/qt/src/qgpgmechangepasswdjob.cpp,
+	lang/qt/src/qgpgmedecryptjob.cpp,
+	lang/qt/src/qgpgmedecryptverifyjob.cpp,
+	lang/qt/src/qgpgmedeletejob.cpp,
+	lang/qt/src/qgpgmedownloadjob.cpp,
+	lang/qt/src/qgpgmeencryptjob.cpp,
+	lang/qt/src/qgpgmeexportjob.cpp,
+	lang/qt/src/qgpgmeimportfromkeyserverjob.cpp,
+	lang/qt/src/qgpgmeimportjob.cpp,
+	lang/qt/src/qgpgmekeyformailboxjob.cpp,
+	lang/qt/src/qgpgmekeygenerationjob.cpp,
+	lang/qt/src/qgpgmekeylistjob.cpp,
+	lang/qt/src/qgpgmelistallkeysjob.cpp,
+	lang/qt/src/qgpgmenewcryptoconfig.cpp,
+	lang/qt/src/qgpgmerefreshkeysjob.cpp,
+	lang/qt/src/qgpgmesecretkeyexportjob.cpp,
+	lang/qt/src/qgpgmesignencryptjob.cpp,
+	lang/qt/src/qgpgmesignjob.cpp,
+	lang/qt/src/qgpgmesignkeyjob.cpp,
+	lang/qt/src/qgpgmetofupolicyjob.cpp,
+	lang/qt/src/qgpgmeverifydetachedjob.cpp,
+	lang/qt/src/qgpgmeverifyopaquejob.cpp,
+	lang/qt/src/qgpgmewkspublishjob.cpp,
+	lang/qt/src/threadedjobmixin.cpp,
+	lang/qt/tests/run-keyformailboxjob.cpp,
+	lang/qt/tests/t-encrypt.cpp,
+	lang/qt/tests/t-keylist.cpp,
+	lang/qt/tests/t-keylocate.cpp,
+	lang/qt/tests/t-ownertrust.cpp,
+	lang/qt/tests/t-support.cpp,
+	lang/qt/tests/t-tofuinfo.cpp,
+	lang/qt/tests/t-wkspublish.cpp: Include config.h
+
+2016-09-21  Andreas Stieger  <astieger@suse.com>
+
+	cpp: Avoid missing returns in non-void functions.
+	+ commit f2babcd71b899200d3ed715fbeb65b52912a6609
+	* lang/cpp/src/context.cpp
+	  (Context::signaturePolicyURL): return nullptr on default
+	  (to_tofu_policy_t): add default case for unknown
+	* lang/cpp/src/key.cpp
+	  (Key::primaryFingerprint): return nullptr on default
+	* lang/cpp/src/tofuinfo.cpp
+	  (GpgME::TofuInfo::policy): add default case for unknown
+
+2016-09-19  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Improve README.
+	+ commit 48c4045dceb9f90d164d5af3fb21c82a40daa9af
+	* lang/cpp/README: Add more content, move license to bottom.
+
+2016-09-16  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add support for gpgme_op_tofu_policy.
+	+ commit 956b44b5764102623a1a81117e771258f0340151
+	* src/context.cpp, src/context.h (setTofuPolicy, setTofuPolicyStart):
+	New.
+
+	cpp: Declare sizes of tofu-info enums.
+	+ commit f029812a9b48b3308c60f1749eeb3370188ad7c0
+	* lang/cpp/src/tofuinfo.h (Policy, Validity): Declare sizes.
+
+2016-09-16  Werner Koch  <wk@gnupg.org>
+
+	cpp: Silence use of deprecated function warning.
+	+ commit 2ab61c95abf8805412a610641176384548133033
+	* lang/cpp/src/context.cpp (GpgME): Use pragma to silence wardning.
+
+2016-09-07  Werner Koch  <wk@gnupg.org>
+
+	core,cpp: Extend the TOFU information.
+	+ commit a913688272b9bda15eb2bc196e55ccae782bcf36
+	* src/gpgme.h.in (struct _gpeme_tofu_info): Rename FIRSTSEEN to
+	SIGNFIRST and LASTSEEN to SIGNLAST.  Add ENCRFIST and ENCRLAST.
+	* src/keylist.c (parse_tfs_record): Parse to ENCRFIRST and ENCRLAST.
+	* src/verify.c (parse_tofu_stats): Ditto.
+	* tests/run-keylist.c (main): Adjust and print encrypt stats.
+	* tests/run-verify.c (print_result): Ditto.
+
+	* lang/cpp/src/tofuinfo.h (TofuInfo): Rename firstSeen to signFirst
+	and lastSeen to signLast.  Add encrCount, encrFirst and encrLast.
+	* lang/cpp/src/tofuinfo.cpp (encrCount, encrFirst, encrLast): New.
+
+2016-09-05  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add convenience update function to a key.
+	+ commit 28a12a89751a6c03d80834fc3195d832a7747076
+	* lang/cpp/src/key.cpp (Key::update): New.
+	* lang/cpp/src/key.h: Update accordingly.
+
+	cpp: Add ostream operators for key and uid.
+	+ commit a149253b65d43f069088a5d6918c7197de08647b
+	* lang/cpp/src/key.cpp (Key, UserID): Add ostream operator.
+	* lang/cpp/src/key.h: Update accordingly.
+
+2016-08-25  Andre Heinecke  <aheinecke@intevation.de>
+
+	cpp: Add WithTofu Keylist Mode.
+	+ commit 00082a0a4c6ee82574a5e56f438138068f4e56a8
+	* lang/cpp/src/context.cpp: Handle WithTofu.
+	* lang/cpp/src/global.h (KeyListMode): Add WithTofu.
+	* lang/cpp/src/util.h (add_to_gpgme_keylist_mode_t): Handle WithTofu.
+
+	Cpp: Change firstSeen / lastSeen return values.
+	+ commit ccd5c742c05726a22c537375bcdd4d1505a5a4a5
+	* lang/cpp/src/tofuinfo.cpp,
+	lang/cpp/src/tofuinfo.h (TofuInfo::firstSeen, TofuInfo::lastSeen):
+	Change return values to unsigned long and update doc.
+
+	Cpp: Add wrapper for gpgme_get_dirinfo.
+	+ commit 1b39ab00a088730bcd093dc5173b10de05eff3a1
+	* lang/cpp/src/context.cpp (dirInfo): New.
+	* lang/cpp/src/global.h (dirInfo): New.
+
+	Cpp: Add support for spawn engine.
+	+ commit 17ef7f612f6ae1a3156e7a9d81dc015cf261ee8c
+	* lang/cpp/src/context.cpp (Context::spawn, Context::spawnAsync): New.
+	* lang/cpp/src/context.h: Add prototypes.
+	(SpawnFlags): New.
+	* lang/cpp/src/global.h (SpawnEngine): Added.
+
+2016-08-24  Werner Koch  <wk@gnupg.org>
+
+	cpp: Get rid of AssuanResult due to its deprecation.
+	+ commit 5c593f92da79a5f1c7ede280011af78f6b8afbcf
+	* lang/cpp/src/assuanresult.cpp: Remove.
+	* lang/cpp/src/assuanresult.h: Remove.
+	* lang/cpp/src/Makefile.am: Remove these files.
+	* lang/cpp/src/context.cpp: Remove header assuanresult.h
+	(assuanTransact): Change return type to Error.  Use
+	gpgme_op_assuan_transact_ext.
+	(startAssuanTransaction): Change return type to Error.
+	(assuanResult): Remove
+	* lang/cpp/src/context.h (assuanResult): Adjust for changes.
+
+2016-08-24  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add Key to signature.
+	+ commit 613ae1fc8f359d8de5c825b2b78844e78e0c8db3
+	* lang/cpp/src/verificationresult.cpp,
+	lang/cpp/src/verificationresult.h (Signature::key): New.
+
+	Cpp: Use fpr field for primaryFingerprint.
+	+ commit fe01e0c661c1494a91209021ab12a035b9044cf6
+	* lang/cpp/src/key.cpp (Key::primaryFingerprint): Return
+	fpr value if available.
+
+2016-08-23  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Move tofuinfo from signature to userid.
+	+ commit 967d8e0aa60042b83e3ac21505d60690585a1f1c
+	* lang/cpp/src/key.cpp (UserID::tofuInfo): New.
+	* lang/cpp/src/key.h: Update accordingly.
+	* lang/cpp/src/tofuinfo.cpp: Remove dropped fields.
+	* lang/cpp/src/tofuinfo.h: Update accordingly.
+	* lang/cpp/src/verificationresult.cpp,
+	lang/cpp/src/verificationresult.h: Remove tofu info.
+	* lang/qt/tests/t-tofuinfo.cpp: Disable for now.
+
+2016-08-17  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Fix some pedantic warnings.
+	+ commit e687f2e387054b0c6e05b31daeb7f70521c4892d
+	* lang/cpp/src/context.cpp,
+	lang/cpp/src/context.h (Context::getKeysFromRecipients): Remove
+	ignored / invalid const qualifier.
+	* lang/cpp/src/result.h: Don't shadow error function in ctor.
+
+2016-08-12  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Provide size-hint for seekable and mem data.
+	+ commit 10a657ea568170d460e7fdca47d30640dbdd0693
+	* lang/cpp/src/data.cpp (GpgME::Data::Data): Set size-hint for
+	mem and DataProvider based Data.
+
+2016-08-10  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Handle empty recipients consistently.
+	+ commit e072e352d17e643a045585edd3877505a8a262c0
+	* lang/cpp/src/context.cpp (Context::getKeysFromRecipients):
+	New helper.
+	(Context::encrypt, Context::startEncryption, Context::signAndEncrypt)
+	(Context::startCombinedSigningAndEncryption): Use new helper.
+	* lang/cpp/src/context.h (Context::getKeysFromRecipients): Add
+	as private helper.
+
+	Cpp: Clarify ownership of provider classes.
+	+ commit cb339b78dc6c1f86edf625dfd9dcd9f2a7aadec8
+	* lang/cpp/src/context.h: Note that the context does not take
+	ownership of providers.
+
+2016-08-09  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add support for all EncryptionFlags.
+	+ commit 7f9052a6202af70c91069b0029d5022d49a700f5
+	* lang/cpp/src/context.h (EncryptionFlags): Extend.
+	* lang/cpp/src/context.cpp (encryptflags2encryptflags): Ditto.
+
+	Cpp: Fix simple symmetric encryption.
+	+ commit 0f665861e0fa66c66f28ee0e423c73f787c3aa0e
+	* lang/cpp/src/context.cpp (Context::encrypt): If no recipients
+	are provided encrypt with NULL and not an empty array.
+
+2016-07-14  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add EngineInfo::Version class.
+	+ commit 4c180b7092e27e4a0216e4a3149ee966339b0b09
+	* lang/cpp/src/engineinfo.cpp (EngineInfo::engineVersion): New.
+	* lang/cpp/src/engineinfo.h (EngineInfo::engineVersion): Declare.
+	(EngineInfo::Version): Small helper to work with versions.
+
+2016-07-13  Werner Koch  <wk@gnupg.org>
+
+	core: New GPGME_DATA_ENCODING_MIME.
+	+ commit 9d37114932a6aab187f71b2b0025f05cbc4826a5
+	* src/gpgme.h.in (GPGME_DATA_ENCODING_MIME): New.
+	* src/data.c (gpgme_data_set_encoding): Adjust check.
+	* src/engine-gpg.c (have_gpg_version): New.
+	(gpg_encrypt, gpg_encrypt_sign): Pass flag '--mimemode'.
+	(gpg_sign): Ditto.
+
+	* lang/cpp/src/data.h (GpgME): Add MimeEncoding.
+	* lang/cpp/src/data.cpp (encoding, setEncoding): Support MimeEncoding.
+
+	* src/gpgme-tool.c (server_data_encoding): Add flag --mime.
+
+2016-07-13  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add feature enum for new identify.
+	+ commit 6acfb3dc8940aae1ee6bf54c6408d301e75dabdc
+	* lang/cpp/src/context.cpp (supported_features2): Add
+	BinaryAndFineGrainedIdentify
+	* lang/cpp/src/global.h (Feature2): ditto.
+
+2016-07-12  Andre Heinecke  <aheinecke@intevation.de>
+
+	Qt/Cpp: Add version headers.
+	+ commit 0058552a5104a44b54a368af466179904689f5f8
+	* lang/cpp/src/gpgmepp_version.h.in,
+	lang/qt/src/qgpgme_version.h.in: New. Version information.
+	* lang/qt/src/Makefile.am, lang/cpp/src/Makefile.am: Add them.
+	* configure.ac: Configure them.
+
+	Qt/Cpp: Add license blurb to export headers.
+	+ commit e77adf53c58b31e85b6764f7b96e14090338a318
+	* lang/cpp/src/gpgmepp_export.h,
+	lang/qt/src/qgpgme_export.h: Add license blurb.
+
+2016-07-07  Justus Winter  <justus@g10code.com>
+
+	cpp: Fix distcheck.
+	+ commit 62c5bf47e5c4fbf18cb4aa05927b879a2ebd4648
+	* lang/cpp/src/Makefile.am (CLEANFILES): Remove generated file.
+
+2016-07-06  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Expose gpgme_pubkey_algo_name.
+	+ commit 2fdc5b4f253652cf1e76c2521c8a6a912bd0eb07
+	* lang/cpp/src/key.cpp (Subkey::publicKeyAlgorithmAsString): New
+	static variant.
+	* lang/cpp/src/key.h: Declare function. Clarify comment about name
+	mismatch.
+
+	Cpp: Add PubkeyAlgo enum.
+	+ commit d6f3e524ac039cabbc35c6e7690b4cf9dbd6ca2d
+	* lang/cpp/src/key.h (Subkey::PubkeyAlgo): New enum.
+	(Subkey::publicKeyAlgorithm): Change return type.
+	* lang/cpp/src/key.cpp (Subkey::publicKeyAlgorithm): Use enum.
+
+2016-07-04  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add support for TOFU_CONFLICT sigsum.
+	+ commit 0fbf90cfdc038d7d85cb4bf9bf4bb478b88e8efb
+	* lang/cpp/src/verificationresult.cpp (GpgME::Signature::Summary):
+	Handle TOFU_CONFLICT.
+	* lang/cpp/src/verificationresult.h (Summary): Add TofuConflict.
+
+	Cpp: Add support for pinentry_mode.
+	+ commit 1c4a5e2de8341794e3819becd95086c9af23dd78
+	* lang/cpp/src/context.cpp (Context::pinentryMode): Return mode.
+	(Context::setPinentryMode): Set mode.
+	* lang/cpp/src/context.h (PinentryMode): Add enum.
+
+2016-07-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add TofuInfo to signatures.
+	+ commit 9306bf2b2c40c82652bf31f337e915a8139a2e6c
+	* lang/cpp/src/tofuinfo.cpp, lang/cpp/src/tofuinfo.h: New class.
+	* lang/cpp/src/verificationresult.cpp (Signature::tofuInfo): New.
+	(VerificationResult::Private): Handle tofu info.
+	(GpgME::operator<<(std::ostream &os, const Signature &sig)): Include
+	TofuInfo in dump.
+	* lang/cpp/src/verificationresult.h (Signature::tofuInfo): New.
+	* lang/cpp/src/Makefile.am (main_sources, gpgmepp_headers): Add
+	new files.
+	* configure.ac (LIBGPGMEPP_LT_REVISION): Bump for new API.
+
+2016-06-27  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Expose new data_identify values.
+	+ commit 8587f60e0749107f233f97efcfe10c05872a2d4f
+	* lang/cpp/src/data.cpp (GpgME::Data::type): Handle PGP Encrypted
+	 and Signature.
+	* lang/cpp/src/data.h: Add values accordingly.
+
+	Cpp: Do not treat KEYEXPIRED as error.
+	+ commit 73709f7141b958c7d219db6bb4f2082b20ae6eef
+	* lang/cpp/src/editinteractor.cpp (status_to_error): No error
+	for KEYEXPIRED.
+
+2016-06-01  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Use whitelist for status messages.
+	+ commit 84265ca79e4f061589dc3a9226ec529fa7c7ff5e
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::needsNoResponse):
+	Use whitelist instead of blacklist.
+
+2016-05-20  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Ignore STATUS_KEY_CONSIDERED when editing.
+	+ commit e3fb1a0985e4dda9c35e768d156b65c6ef2d9554
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::needsNoResponse):
+	Handle GPGME_STATUS_KEY_CONSIDERED.
+
+2016-05-17  Andre Heinecke  <aheinecke@intevation.de>
+
+	Qt / Cpp: Port auto_ptr to unique_ptr.
+	+ commit 5b0f6fc788808abaa0cdb60e7cbdc21174999f62
+	* lang/cpp/src/context.cpp,
+	lang/cpp/src/context.h,
+	lang/cpp/src/context_p.h (Context::createForEngine),
+	(Context::edit, Context::startEditing),
+	(Context::takeLastEditInteractor, Context::cardEdit),
+	(Context::startCardEditing, Context::takeLastCardEditInteractor),
+	(Context::assuanTransact, Context::startAssuanTransaction),
+	(Context::takeLastAssuanTransaction): Port to unique_ptr.
+	* lang/qt/src/qgpgmeadduseridjob.cpp,
+	lang/qt/src/qgpgmechangeexpiryjob.cpp,
+	lang/qt/src/qgpgmechangeownertrustjob.cpp,
+	lang/qt/src/qgpgmechangepasswdjob.cpp,
+	lang/qt/src/qgpgmesignkeyjob.cpp: Update accordingly.
+
+2016-05-11  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Ensure gpgme.h is taken from current build.
+	+ commit a2263b4f90392bb183f9989079c91e0db8e54ca8
+	* lang/cpp/src/Makefile.am (AM_CPPFLAGS): Add gpgme.h location.
+
+2016-05-10  Andre Heinecke  <aheinecke@intevation.de>
+
+	Qt / Cpp: Fix make dist.
+	+ commit 53ad5cabc563e0806f58f7ced6434ad6c9a038d6
+	* lang/cpp/src/Makefile.am (EXTRA_DIST): Fix typo.
+	(private_gpgmepp_headers): New. Private headers.
+	(libgpgmepp_la_SOURCES): Add private headers.
+	* lang/qt/src/Makefile.am (t_keylist_SOURCES): Remove non existent
+	header.
+
+2016-05-06  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Handle PINENTRY_LAUNCHED status line.
+	+ commit cdb77b6bedf171d733335152d378647683ea322b
+	* lang/cpp/src/editinteractor.cpp (EditInteractor::needsNoResponse):
+	Add GPGME_STATUS_PINENTRY_LAUNCHED.
+
+2016-04-12  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp: Add support for pubkey_algo_name.
+	+ commit 69920c34f3d51155a8c7b6307b0925cc33ff7da3
+	* lang/cpp/src/key.cpp (Subkey::algoName): New.
+	* lang/cpp/src/key.h: Declare.
+
+	Cpp: Add support for gpgme_data_identify.
+	+ commit c6fa0ca7de3110a1d9bb53fd121dd46ea83f17d4
+	* lang/cpp/src/data.cpp (Data::type): New.
+	* lang/cpp/src/data.h (Data::Type): New enum mapping.
+
+2016-04-11  Andre Heinecke  <aheinecke@intevation.de>
+
+	Qt / Cpp: Mention coding style in READMES.
+	+ commit bc7ad951e125164f11428e5893635fb33aa7da09
+	* src/lang/cpp/README, src/lang/qt/README: Add hacking note.
+
+	Cpp: Add string comparators for keys.
+	+ commit 57bafe40ebe5f75db7dd7d33145a468f5265a6e0
+	* lang/cpp/src/global.h (GPGMEPP_MAKE_STRCMP): New.
+	  (_gpgmepp_strcmp): NULL save wrapper around std::strcmp.
+	* lang/cpp/src/key.h: Add comparators for various attributes.
+
+	Cpp: Remove last usages of boost.
+	+ commit aa41f5ddeff935b758575f83699b9f40b16114e0
+	* lang/cpp/src/configuration.cpp: Use std::remove_pointer.
+	  (Configuration::operator<<): std::for_each.
+	* lang/cpp/src/context.cpp: Delete manually instead of scoped ptr.
+	* lang/cpp/src/scdgetinfoassuantransaction.cpp: Use static_assert.
+	  (to_reader_list): Tokenize with getline.
+
+2016-04-04  Andre Heinecke  <aheinecke@intevation.de>
+
+	Add pthread in gpgmepp config.
+	+ commit 76942e07e4cdcf31d237a48e8687e0831c33e565
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in: Add pthread.
+
+2016-04-03  Andre Heinecke  <aheinecke@intevation.de>
+
+	Cpp / Qt: Reduce boost usage (memory and tuple)
+	+ commit c67a7d96630025e4cbead08dec5adbae4be02fba
+	* cpp/src/assuanresult.h,
+	 cpp/src/configuration.cpp,
+	 cpp/src/configuration.h,
+	 cpp/src/data.h,
+	 cpp/src/decryptionresult.h,
+	 cpp/src/defaultassuantransaction.cpp,
+	 cpp/src/encryptionresult.cpp,
+	 cpp/src/encryptionresult.h,
+	 cpp/src/engineinfo.h,
+	 cpp/src/gpgagentgetinfoassuantransaction.cpp,
+	 cpp/src/gpgsignkeyeditinteractor.cpp,
+	 cpp/src/importresult.cpp,
+	 cpp/src/importresult.h,
+	 cpp/src/key.h,
+	 cpp/src/keygenerationresult.h,
+	 cpp/src/keylistresult.h,
+	 cpp/src/notation.h,
+	 cpp/src/signingresult.cpp,
+	 cpp/src/signingresult.h,
+	 cpp/src/verificationresult.cpp,
+	 cpp/src/verificationresult.h,
+	 cpp/src/vfsmountresult.h,
+	 qt/src/dataprovider.cpp,
+	 qt/src/dataprovider.h,
+	 qt/src/decryptjob.h,
+	 qt/src/decryptverifyjob.h,
+	 qt/src/downloadjob.h,
+	 qt/src/encryptjob.h,
+	 qt/src/qgpgmeadduseridjob.cpp,
+	 qt/src/qgpgmechangeexpiryjob.cpp,
+	 qt/src/qgpgmechangeownertrustjob.cpp,
+	 qt/src/qgpgmechangepasswdjob.cpp,
+	 qt/src/qgpgmedecryptjob.cpp,
+	 qt/src/qgpgmedecryptjob.h,
+	 qt/src/qgpgmedecryptverifyjob.cpp,
+	 qt/src/qgpgmedecryptverifyjob.h,
+	 qt/src/qgpgmedeletejob.cpp,
+	 qt/src/qgpgmedownloadjob.cpp,
+	 qt/src/qgpgmedownloadjob.h,
+	 qt/src/qgpgmeencryptjob.cpp,
+	 qt/src/qgpgmeencryptjob.h,
+	 qt/src/qgpgmeexportjob.cpp,
+	 qt/src/qgpgmeexportjob.h,
+	 qt/src/qgpgmeimportfromkeyserverjob.cpp,
+	 qt/src/qgpgmeimportfromkeyserverjob.h,
+	 qt/src/qgpgmeimportjob.cpp,
+	 qt/src/qgpgmeimportjob.h,
+	 qt/src/qgpgmekeygenerationjob.cpp,
+	 qt/src/qgpgmekeygenerationjob.h,
+	 qt/src/qgpgmekeylistjob.cpp,
+	 qt/src/qgpgmekeylistjob.h,
+	 qt/src/qgpgmelistallkeysjob.cpp,
+	 qt/src/qgpgmelistallkeysjob.h,
+	 qt/src/qgpgmenewcryptoconfig.cpp,
+	 qt/src/qgpgmenewcryptoconfig.h,
+	 qt/src/qgpgmesignencryptjob.cpp,
+	 qt/src/qgpgmesignencryptjob.h,
+	 qt/src/qgpgmesignjob.cpp,
+	 qt/src/qgpgmesignjob.h,
+	 qt/src/qgpgmesignkeyjob.cpp,
+	 qt/src/qgpgmeverifydetachedjob.cpp,
+	 qt/src/qgpgmeverifydetachedjob.h,
+	 qt/src/qgpgmeverifyopaquejob.cpp,
+	 qt/src/qgpgmeverifyopaquejob.h,
+	 qt/src/signencryptjob.h,
+	 qt/src/signjob.h,
+	 qt/src/threadedjobmixin.h,
+	 qt/src/verifydetachedjob.h,
+	 qt/src/verifyopaquejob.h: Reduce boost usage.
+
+2016-04-02  Andre Heinecke  <aheinecke@intevation.de>
+
+	Add additional include path in config files.
+	+ commit 1c89addf7698bf4b28a88261262824e5a7770289
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in
+	 lang/qt/src/QGpgmeConfig.cmake.in.in: Include directory above headers.
+
+2016-03-08  Andre Heinecke  <aheinecke@intevation.de>
+
+	Add qgpgme as qt language binding.
+	+ commit 1b3353ee2e5b38b138e4c362929c20aedfbee38c
+	* configure.ac: Add version defines. Check for qt if neccessary.
+	* lang/README: Mention qt
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in: Remove comment. Find qgpgme.
+	* lang/qt/src/Makefile.am: New. Build qgpgme.
+	* lang/qt/README,
+	 lang/qt/src/Makefile.am,
+	 lang/qt/src/QGpgmeConfig.cmake.in.in,
+	 lang/qt/src/QGpgmeConfigVersion.cmake.in,
+	 lang/qt/src/dataprovider.cpp,
+	 lang/qt/src/dataprovider.h,
+	 lang/qt/src/qgpgme_export.h,
+	 m4/qt.m4: New.
+	* lang/cpp/src/GpgmeppConfig.cmake.in.in,
+	 lang/cpp/src/Makefile.am: Fix generated config file.
+
+2016-02-22  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	NB: Changes done before the import of the sources from KDE's gpgmepp
+	repository into g10 Code's gpgme repository can be found in the
+	history of g10 Code's gpgmepp repository.  Changes done on the
+	aegypten_branch before 2004-02-09 are "lost" in KDE's svn repository
+	backups.
+
+        -----
+        Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                      2010, 2011, 2012, 2013 g10 Code GmbH
+
+	Copying and distribution of this file and/or the original GIT
+	commit log messages, with or without modification, are
+	permitted provided the copyright notice and this notice are
+	preserved.

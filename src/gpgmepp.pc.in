@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+@pkgconfig_host_line@
+Name: gpgmepp
+Description: GnuPG Made Easy (C++ binding)
+Requires.private: gpg-error, gpgme
+Version: @G10_FULL_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lgpgmepp
+URL: https://www.gnupg.org/software/gpgme/index.html
