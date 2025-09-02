@@ -1,0 +1,5 @@
+usr/include/gpgme++
+usr/lib/*/cmake/Gpgmepp
+usr/lib/*/libgpgmepp.a
+usr/lib/*/libgpgmepp.so
+usr/lib/*/pkgconfig/gpgmepp.pc

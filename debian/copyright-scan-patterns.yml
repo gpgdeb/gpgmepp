@@ -1,0 +1,11 @@
+ignore:
+  pattern:
+  - ChangeLog
+  - README
+  - doc/HACKING
+  - doc/DCO
+  - .gitattributes
+  - build-aux/git-hooks/commit-msg
+  - build-aux/git-log-footer
+  - cmake/modules/ECMVersionHeader.h.in
+  - tests/README

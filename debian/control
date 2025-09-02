@@ -1,0 +1,50 @@
+Source: gpgmepp
+Priority: optional
+Section: libs
+Maintainer: GnuPG Maintainers <package-maintainers@gnupg.org>
+Build-Depends:
+ debhelper-compat (= 13),
+ dpkg-dev (>= 1.22.5),
+ cmake (>= 3.16),
+ gnupg-agent,
+ gnupg2 | gnupg (>= 2),
+ gpgrt-tools,
+ gpgsm,
+ libgpg-error-dev (>= 1.47),
+ libgpgme-dev (>= 2.0.0),
+ pkgconf,
+ scdaemon,
+Standards-Version: 4.7.2
+Homepage: https://gnupg.org/software/gpgme/
+Vcs-Git: https://github.com/gpgdeb/gpgmepp.git -b gnupg/stable
+Vcs-Browser: https://github.com/gpgdeb/gpgmepp
+Rules-Requires-Root: no
+
+Package: libgpgmepp7
+Architecture: any
+Multi-Arch: same
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+Description: C++ wrapper library for GPGME
+ GpgME++ (aka GpgMEpp) is a C++ wrapper (or C++ bindings) for the
+ GnuPG project's GPGME (GnuPG Made Easy) library.
+ .
+ This is the official upstream C++ binding for GPGME.
+
+Package: libgpgmepp-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends:
+ libgpg-error-dev,
+ libgpgmepp7 (= ${binary:Version}),
+ ${misc:Depends},
+Recommends:
+ libgpgmepp-doc,
+Description: C++ wrapper library for GPGME (development files)
+ GpgME++ (aka GpgMEpp) is a C++ wrapper (or C++ bindings) for the
+ GnuPG project's GPGME (GnuPG Made Easy) library.
+ .
+ This package contains the headers and other files needed to compile
+ against it.
