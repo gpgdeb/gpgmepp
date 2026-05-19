@@ -22,11 +22,20 @@ macro(_g10_add_testprogram _source)
     get_filename_component(_name ${_source} NAME_WE)
     add_executable(${_name} ${_source})
     target_link_libraries(${_name} Gpgmepp)
-    set_target_properties(${_target} PROPERTIES
+    set_target_properties(${_name} PROPERTIES
                           WIN32_EXECUTABLE FALSE # don't build as GUI app on Windows
                           MACOSX_BUNDLE FALSE # don't build as GUI app on macOS
     )
 endmacro()
+
+macro(_g10_add_test _source)
+    _g10_add_testprogram(${_source})
+    get_filename_component(_name ${_source} NAME_WE)
+    add_test(NAME ${_name} COMMAND ${_name})
+endmacro()
+
+_g10_add_test(t-flags.cpp)
+_g10_add_test(t-utils.cpp)
 
 _g10_add_testprogram(run-createkey.cpp)
 _g10_add_testprogram(run-genrandom.cpp)

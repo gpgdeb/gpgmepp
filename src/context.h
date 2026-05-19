@@ -57,6 +57,7 @@ class EncryptionResult;
 class VfsMountResult;
 class RandomBytesResult;
 class RandomValueResult;
+class RandomZBase32StringResult;
 
 class EngineInfo;
 
@@ -249,8 +250,8 @@ public:
     // Key Deletion
     //
 
-    GpgME::Error deleteKey(const Key &key, bool allowSecretKeyDeletion = false);
-    GpgME::Error startKeyDeletion(const Key &key, bool allowSecretKeyDeletion = false);
+    GpgME::Error deleteKey(const Key &key, DeletionFlags flags);
+    GpgME::Error startKeyDeletion(const Key &key, DeletionFlags flags);
 
     //
     // Passphrase changing
@@ -537,13 +538,40 @@ public:
     // Random values
     //
     //
-    enum class RandomMode {
+    enum class GPGMEPP_DEPRECATED RandomMode {
         Normal = 0,
         ZBase32 = 1
     };
-    RandomBytesResult generateRandomBytes(size_t count, RandomMode mode = RandomMode::Normal);
+    /*!
+     * Generate random bytes.
+     *
+     * This function creates a buffer of \a count bytes and fills this buffer by calling
+     * gpgme_op_random_bytes. \a count must be at most \c 1024. If \a mode is \c ZBase32
+     * then \a count must be at least \c 31. In this case the buffer is filled with 30
+     * ASCII characters followed by a null byte; the remainder of the buffer is uninitialized.
+     *
+     * This function is deprecated. For \c Normal mode use the other overload of
+     * generateRandomBytes. For \c ZBase32 mode use generateRandomZBase32String.
+     */
+    GPGMEPP_DEPRECATED RandomBytesResult generateRandomBytes(size_t count, RandomMode mode);
 
+    /*!
+     * Generate random bytes.
+     *
+     * This function creates a buffer of \a count bytes and fills this buffer with random
+     * bytes retrieved from gpg. \a count must be at most \c 1024.
+     */
+    RandomBytesResult generateRandomBytes(size_t count);
+
+    /*!
+     * Generate an unbiased random value in the range [0, \a limit).
+     */
     RandomValueResult generateRandomValue(unsigned int limit);
+
+    /*!
+     * Generate a string with 30 random z-base-32 characters.
+     */
+    RandomZBase32StringResult generateRandomZBase32String();
 
     //
     //
@@ -632,6 +660,8 @@ public:
                                                unsigned long reserved,
                                                unsigned long expires,
                                                unsigned int flags);
+    GPGMEPP_DEPRECATED GpgME::Error deleteKey(const Key &key, bool allowSecretKeyDeletion = false);
+    GPGMEPP_DEPRECATED GpgME::Error startKeyDeletion(const Key &key, bool allowSecretKeyDeletion = false);
 
 private:
     // Helper functions that need to be context because they rely

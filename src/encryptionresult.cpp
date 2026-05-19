@@ -43,12 +43,9 @@
 class GpgME::EncryptionResult::Private
 {
 public:
-    explicit Private(const gpgme_encrypt_result_t r)
+    explicit Private(const _gpgme_op_encrypt_result &r) : res(r)
     {
-        if (!r) {
-            return;
-        }
-        for (gpgme_invalid_key_t ik = r->invalid_recipients ; ik ; ik = ik->next) {
+        for (gpgme_invalid_key_t ik = res.invalid_recipients ; ik ; ik = ik->next) {
             gpgme_invalid_key_t copy = new _gpgme_invalid_key(*ik);
             if (ik->fpr) {
                 copy->fpr = strdup(ik->fpr);
@@ -56,6 +53,7 @@ public:
             copy->next = nullptr;
             invalid.push_back(copy);
         }
+        res.invalid_recipients = nullptr;
     }
     ~Private()
     {
@@ -65,6 +63,7 @@ public:
         }
     }
 
+    _gpgme_op_encrypt_result res;
     std::vector<gpgme_invalid_key_t> invalid;
 };
 
@@ -89,10 +88,20 @@ void GpgME::EncryptionResult::init(gpgme_ctx_t ctx)
     if (!res) {
         return;
     }
-    d.reset(new Private(res));
+    d.reset(new Private(*res));
 }
 
 make_standard_stuff(EncryptionResult)
+
+bool GpgME::EncryptionResult::isDeVs() const
+{
+    return d && d->res.is_de_vs;
+}
+
+bool GpgME::EncryptionResult::isBetaCompliance() const
+{
+    return d && d->res.beta_compliance;
+}
 
 unsigned int GpgME::EncryptionResult::numInvalidRecipients() const
 {
@@ -144,7 +153,9 @@ std::ostream &GpgME::operator<<(std::ostream &os, const EncryptionResult &result
 {
     os << "GpgME::EncryptionResult(";
     if (!result.isNull()) {
-        os << "\n error:        " << result.error()
+        os << "\n error:            " << result.error()
+           << "\n isDeVs:           " << result.isDeVs()
+           << "\n isBetaCompliance: " << result.isBetaCompliance()
            << "\n invalid recipients:\n";
         const std::vector<InvalidRecipient> ir = result.invalidEncryptionKeys();
         std::copy(ir.begin(), ir.end(),

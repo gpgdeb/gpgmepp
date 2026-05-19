@@ -21,7 +21,7 @@
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-set(FULL_VERSION "2.0.0")
+set(FULL_VERSION "2.1.0")
 
 string(REGEX MATCH "^[0-9]+.[0-9]+.[0-9]+" cmake_compat_version ${FULL_VERSION})
 project(gpgmepp VERSION ${cmake_compat_version})
@@ -35,8 +35,8 @@ set(VERSION_MICRO ${PROJECT_VERSION_PATCH})
 #   (Interfaces added/removed/changed:	CURRENT++, REVISION=0)
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed:		AGE=0)
-set(LIBGPGMEPP_LT_CURRENT "7")
-set(LIBGPGMEPP_LT_AGE "0")
+set(LIBGPGMEPP_LT_CURRENT "8")
+set(LIBGPGMEPP_LT_AGE "1")
 set(LIBGPGMEPP_LT_REVISION "0")
 math(EXPR LIBGPGMEPP_SOVERSION "${LIBGPGMEPP_LT_CURRENT} - ${LIBGPGMEPP_LT_AGE}")
 
@@ -48,6 +48,7 @@ option(ENABLE_STATIC "Build static libraries" OFF)
 # The following option is used in gpg4win to distinguish the 32-bit build from
 # the 64-bit build
 option(PKGCONFIG_HOST "The host value to write in the pkgconfig file" "")
+option(CONFIGURE_FOR_DISTRIBUTION "Configure only for `make dist`, etc., ignoring required dependencies" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
@@ -63,9 +64,13 @@ include(FeatureSummary)
 include(GNUInstallDirs)
 
 find_package(LibGpgError ${GPG_ERROR_REQUIRED_VERSION})
-set_package_properties(LibGpgError PROPERTIES TYPE REQUIRED)
 find_package(Gpgme ${GPGME_REQUIRED_VERSION})
-set_package_properties(Gpgme PROPERTIES TYPE REQUIRED)
+if (CONFIGURE_FOR_DISTRIBUTION)
+    message(WARNING "Configuring only for running `make dist`, etc., ignoring required dependencies")
+else()
+    set_package_properties(LibGpgError PROPERTIES TYPE REQUIRED)
+    set_package_properties(Gpgme PROPERTIES TYPE REQUIRED)
+endif()
 
 g10_get_full_version()
 
@@ -113,10 +118,12 @@ endif()
 include(G10GitHooks)
 g10_configure_git_hooks()
 
-add_subdirectory(src)
+if (LibGpgError_FOUND AND Gpgme_FOUND)
+    add_subdirectory(src)
 
-if(BUILD_TESTING AND ENABLE_SHARED)
-    add_subdirectory(tests)
+    if(BUILD_TESTING AND ENABLE_SHARED)
+        add_subdirectory(tests)
+    endif()
 endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

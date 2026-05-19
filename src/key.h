@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <ctime>
@@ -338,7 +339,20 @@ public:
 
     const char *cardSerialNumber() const;
 
+    /*!
+     * Returns the keygrip(s) of the subkey in hex digit form or NULL if not available.
+     * For combined algorithms the keygrips are delimited by comma.
+     *
+     * \sa keyGrips
+     */
     const char *keyGrip() const;
+
+    /*!
+     * Returns the list of keygrips of the subkey in hex digit form.
+     *
+     * \note The individual keygrips are not necessarily null-terminated.
+     */
+    std::vector<std::string_view> keyGrips() const;
 
 private:
     shared_gpgme_key_t key;

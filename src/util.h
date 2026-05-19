@@ -190,6 +190,16 @@ static inline std::vector<std::string> split(const std::string &text, char delim
     return result;
 }
 
+namespace _gpgmepp {
+
+/*!
+ * Splits \a s into substrings whereever \a delimiter occurs.
+ * Empty substrings are omitted.
+ */
+GPGMEPP_EXPORT std::vector<std::string_view> split_into_string_views(const char *s, char delimiter);
+
+} // namespace _gpgmepp
+
 /**
  * Adapter for passing a vector of strings as NULL-terminated array of
  * const char* to the C-interface of gpgme.

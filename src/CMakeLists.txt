@@ -80,6 +80,7 @@ set(Gpgmepp_HEADERS
     error.h
     eventloopinteractor.h
     exception.h
+    flags.h
     global.h
     gpgaddexistingsubkeyeditinteractor.h
     gpgadduserideditinteractor.h
@@ -195,7 +196,7 @@ configure_package_config_file(GpgmeppConfig.cmake.in
 
 if(ENABLE_SHARED)
     if (MSVC)
-        install(TARGETS Gpgmepp EXPORT GpgmeppTargets "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
+        install(TARGETS Gpgmepp EXPORT GpgmeppTargets DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
     else()
         install(TARGETS Gpgmepp EXPORT GpgmeppTargets)
     endif()

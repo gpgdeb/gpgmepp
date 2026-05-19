@@ -1,3 +1,109 @@
+2026-05-18  Werner Koch  <wk@gnupg.org>
+
+	Release 2.1.0.
+	+ commit 6a99d7eef09aedd768356792f38aca2cc03659da
+
+
+2026-04-21  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add support for new flags of encryption results.
+	+ commit f12b36209758e82a53a8bfcc4ac0889bc9ecc0ed
+	* src/encryptionresult.h, src/encryptionresult.cpp (class
+	EncryptionResult): New methods isDeVs and isBetaCompliance.
+	* src/encryptionresult.cpp (EncryptionResult::Private): New
+	field res.
+	(EncryptionResult::Private::Private): Change type of argument r from
+	pointer to const-reference. Copy-construct res from r. Clear
+	invalid_recipients field of res after copying invalid recipients.
+	(EncryptionResult::init): Adapt call of Private c'tor to changed
+	argument type.
+	(operator<<): Add new flags.
+
+2026-02-18  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Improve API to generate random bytes and z-base-32 characters.
+	+ commit fea0862b4f7857f780d417e5e178fb2753f2e901
+	* src/context.h (enum class RandomMode): Deprecate.
+	(generateRandomBytes): Deprecate overload taking RandomMode parameter.
+	* src/context.h, src/context.cpp (generateRandomBytes): New overload
+	taking only size_t parameter.
+	(generateRandomZBase32String): New.
+	* src/randomresults.h (RandomZBase32StringResult): New.
+
+	* tests/run-genrandom.cpp (main): Use generateRandomZBase32String
+	instead of deprecated generateRandomBytes.
+
+	Avoid copy of generated random bytes.
+	+ commit 7025cb4b211bcda5e07620f12eb806c14ca95e0d
+	* src/randomresults.h (class RandomBytesResult): Add constructor for
+	moving value into result.
+	* src/context.cpp (Context::generateRandomBytes): Use new constructor.
+
+2026-02-17  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	tests: Fix conversion of random zbase32 data to string.
+	+ commit fade4bbe630b7e597d1cd3308819110490cae598
+	* tests/run-genrandom.cpp (main): Pass data to std::string constructor
+	instead of copying it byte by byte.
+
+2025-12-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Use DeletionFlags in key deletion API.
+	+ commit 527df234fb2fea51dfc6e9f84f3c98914b38b88e
+	* src/context.h, src/context.cpp (Context::startKeyDeletion): Add
+	overload taking DeletionFlags.
+	* src/context.cpp (Context::startKeyDeletion): Make overload taking a
+	bool use new overload.
+	* src/context.h (Context::deleteKey, Context::startKeyDeletion): Mark
+	overloads taking a bool as deprecated.
+
+	Use new Flags template for new Deletion flags.
+	+ commit d8098f30da95621dff88d815ab29534fec5014e4
+	* src/global.h (DeletionFlags): Rename to...
+	(DeletionFlag): ...this. Change underlying type to unsigned int. Remove
+	UseDefaults enum value.
+	(DeletionFlags): New type for combinations of DeletionFlag. Define enum
+	flag operators for this type.
+	(operator|): Remove overload for DeletionFlags.
+	* src/context.cpp (Context::deleteKey): Adapt to above changes.
+
+	Add template class for type-safe enum-based flags.
+	+ commit bb44fc70e48e8be61f5ab6352796f5c0610dd848
+	* src/CMakeLists.txt (Gpgmepp_HEADERS): Add new file.
+	* src/flags.h: New.
+	* tests/CMakeLists.txt: Add new test.
+	* tests/t-flags.cpp: New.
+
+2025-11-19  Tobias Fella  <tobias.fella@gnupg.com>
+
+	Allow passing flags to Context::deleteKey.
+	+ commit 550a0666b25a84534c83237b211053c875fe4795
+	GnuPG-Bug-ID: 7538
+
+2025-10-29  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add function to get keygrips of subkey using combined algorithms.
+	+ commit 71b7d24a2782d56be9560d2c6a44211aff07e0f1
+	* src/key.cpp, src/key.h (Subkey::keyGrips): New.
+
+	Add internal utility function for splitting a string into string views.
+	+ commit fa1e892b1414da07aa467bda295f8981b191374d
+	* src/util.cpp, src/util.h (split_into_string_views): New.
+
+	* tests/CMakeLists.txt: Add macro _g10_add_test. Add new test.
+	* tests/t-utils.cpp: New.
+
+2025-10-24  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Use gpgme_ssize_t everywhere.
+	+ commit 268f2feea0b0c7025016170a4a2e3dee2c3aa0fd
+	* src/editinteractor.cpp (edit_interactor_callback_impl): Replace
+	ssize_t with gpgme_ssize_t.
+
+	build: Fix install with MSVC.
+	+ commit e0b20e967654446dbe06b09e8d73cc97e02aac2b
+	* CMakeLists.txt: Add missing DESTINATION keyword to install arguments.
+
 2025-06-03  Werner Koch  <wk@gnupg.org>
 
 	Release 2.0.0.
@@ -5,6 +111,13 @@
 
 
 2025-06-03  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	build: Add option CONFIGURE_FOR_DISTRIBUTION.
+	+ commit 592efbfcfb61be34ede8ebe66ee8bc3952c131c6
+	* CMakeLists.txt: Add option CONFIGURE_FOR_DISTRIBUTION. Set
+	LibGpgError and Gpgme as required if option CONFIGURE_FOR_DISTRIBUTION
+	is not set. Add src (and tests) only if required dependencies were
+	found.
 
 	build: Fix logic for appending "-unknown" to version number.
 	+ commit 1e948b3f3ee10806eaee282e489609fa370277d8

@@ -64,6 +64,9 @@ public:
 
     bool isNull() const;
 
+    bool isDeVs() const;
+    bool isBetaCompliance() const;
+
     unsigned int numInvalidRecipients() const;
 
     InvalidRecipient invalidEncryptionKey(unsigned int index) const;
