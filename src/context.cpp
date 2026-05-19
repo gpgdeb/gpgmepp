@@ -760,14 +760,24 @@ ImportResult Context::importResult() const
 
 Error Context::deleteKey(const Key &key, bool allowSecretKeyDeletion)
 {
+    return deleteKey(key, allowSecretKeyDeletion ? DeletionFlags{DeletionFlag::AllowSecret} : DeletionFlags{});
+}
+
+Error Context::deleteKey(const Key &key, DeletionFlags flags)
+{
     d->lastop = Private::Delete;
-    return Error(d->lasterr = gpgme_op_delete(d->ctx, key.impl(), int(allowSecretKeyDeletion)));
+    return Error(d->lasterr = gpgme_op_delete_ext(d->ctx, key.impl(), flags.toUnderlyingType()));
 }
 
 Error Context::startKeyDeletion(const Key &key, bool allowSecretKeyDeletion)
 {
+    return startKeyDeletion(key, allowSecretKeyDeletion ? DeletionFlags{DeletionFlag::AllowSecret} : DeletionFlags{});
+}
+
+Error Context::startKeyDeletion(const Key &key, DeletionFlags flags)
+{
     d->lastop = Private::Delete;
-    return Error(d->lasterr = gpgme_op_delete_start(d->ctx, key.impl(), int(allowSecretKeyDeletion)));
+    return Error(d->lasterr = gpgme_op_delete_start(d->ctx, key.impl(), flags.toUnderlyingType()));
 }
 
 Error Context::passwd(const Key &key)
@@ -1829,6 +1839,8 @@ const char *Context::getFlag(const char *name) const
   return gpgme_get_ctx_flag(d->ctx, name);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 RandomBytesResult Context::generateRandomBytes(size_t count, RandomMode mode)
 {
     RandomBytesResult::value_type randomBytes(count);
@@ -1837,7 +1849,19 @@ RandomBytesResult Context::generateRandomBytes(size_t count, RandomMode mode)
     if (d->lasterr) {
         return RandomBytesResult{Error{d->lasterr}};
     }
-    return RandomBytesResult{randomBytes};
+    return RandomBytesResult{std::move(randomBytes)};
+}
+#pragma GCC diagnostic pop
+
+RandomBytesResult Context::generateRandomBytes(size_t count)
+{
+    RandomBytesResult::value_type randomBytes(count);
+    d->lasterr = gpgme_op_random_bytes(d->ctx, GPGME_RANDOM_MODE_NORMAL,
+                                       reinterpret_cast<char *>(randomBytes.data()), count);
+    if (d->lasterr) {
+        return RandomBytesResult{Error{d->lasterr}};
+    }
+    return RandomBytesResult{std::move(randomBytes)};
 }
 
 RandomValueResult Context::generateRandomValue(unsigned int limit)
@@ -1848,6 +1872,17 @@ RandomValueResult Context::generateRandomValue(unsigned int limit)
         return RandomValueResult{Error{d->lasterr}};
     }
     return RandomValueResult{static_cast<unsigned int>(randomValue)};
+}
+
+RandomZBase32StringResult Context::generateRandomZBase32String()
+{
+    std::string randomString(30, '\0');
+    d->lasterr = gpgme_op_random_bytes(d->ctx, GPGME_RANDOM_MODE_ZBASE32,
+                                       randomString.data(), 31);
+    if (d->lasterr) {
+        return RandomZBase32StringResult{Error{d->lasterr}};
+    }
+    return RandomZBase32StringResult{std::move(randomString)};
 }
 
 // Engine Spawn stuff

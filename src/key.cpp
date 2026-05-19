@@ -611,6 +611,14 @@ const char *Subkey::keyGrip() const
     return subkey ? subkey->keygrip : nullptr;
 }
 
+std::vector<std::string_view> Subkey::keyGrips() const
+{
+    if (!subkey || !subkey->keygrip) {
+        return {};
+    }
+    return _gpgmepp::split_into_string_views(subkey->keygrip, ',');
+}
+
 bool Subkey::isSecret() const
 {
     return subkey && subkey->secret;

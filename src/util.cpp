@@ -29,6 +29,26 @@
 
 #include <functional>
 
+#include <cstring>
+
+std::vector<std::string_view> _gpgmepp::split_into_string_views(const char *s, char delimiter)
+{
+    std::vector<std::string_view> result;
+    if (!s) {
+        return result;
+    }
+    while (const char *segment_end = std::strchr(s, delimiter)) {
+        if (const auto segment_size = segment_end - s) {
+            result.emplace_back(s, segment_size);
+        }
+        s = segment_end + 1;
+    };
+    if (const auto segment_size = std::strlen(s)) {
+        result.emplace_back(s, segment_size);
+    }
+    return result;
+}
+
 StringsToCStrings::StringsToCStrings(const std::vector<std::string>& v)
     : m_strings{v}
 {
