@@ -28,6 +28,7 @@
 #include "util.h"
 
 #include <functional>
+#include <iterator>
 
 #include <cstring>
 

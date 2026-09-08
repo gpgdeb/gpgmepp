@@ -70,6 +70,12 @@ public:
 # else
             scopy->pka_address = nullptr;
 # endif
+            if (is->issuer_serial) {
+                scopy->issuer_serial = strdup(is->issuer_serial);
+            }
+            if (is->issuer_name) {
+                scopy->issuer_name = strdup(is->issuer_name);
+            }
             scopy->next = nullptr;
             sigs.push_back(scopy);
             // copy keys
@@ -102,6 +108,8 @@ public:
         for (std::vector<gpgme_signature_t>::iterator it = sigs.begin() ; it != sigs.end() ; ++it) {
             std::free((*it)->fpr);
             std::free((*it)->pka_address);
+            std::free((*it)->issuer_serial);
+            std::free((*it)->issuer_name);
             delete *it; *it = nullptr;
         }
         for (std::vector< std::vector<Nota> >::iterator it = nota.begin() ; it != nota.end() ; ++it) {
@@ -248,6 +256,22 @@ const char *GpgME::Signature::fingerprint() const
     return isNull() ? nullptr : d->sigs[idx]->fpr ;
 }
 
+const char *GpgME::Signature::issuerSerial() const
+{
+    if (isNull()) {
+        return nullptr;
+    }
+    return d->sigs[idx]->issuer_serial ? d->sigs[idx]->issuer_serial : d->keys[idx].issuerSerial();
+}
+
+const char *GpgME::Signature::issuerName() const
+{
+    if (isNull()) {
+        return nullptr;
+    }
+    return d->sigs[idx]->issuer_name ? d->sigs[idx]->issuer_name : d->keys[idx].issuerName();
+}
+
 GpgME::Error GpgME::Signature::status() const
 {
     return Error(isNull() ? 0 : d->sigs[idx]->status);
@@ -376,6 +400,11 @@ const char *GpgME::Signature::hashAlgorithmAsString() const
 const char *GpgME::Signature::policyURL() const
 {
     return isNull() ? nullptr : d->purls[idx] ;
+}
+
+unsigned int GpgME::Signature::numNotations() const
+{
+    return isNull() ? 0 : d->nota[idx].size();
 }
 
 GpgME::Notation GpgME::Signature::notation(unsigned int nidx) const

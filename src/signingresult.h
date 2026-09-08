@@ -66,9 +66,11 @@ public:
 
     bool isNull() const;
 
+    unsigned int numCreatedSignatures() const;
     CreatedSignature createdSignature(unsigned int index) const;
     std::vector<CreatedSignature> createdSignatures() const;
 
+    unsigned int numInvalidSigningKeys() const;
     InvalidSigningKey invalidSigningKey(unsigned int index) const;
     std::vector<InvalidSigningKey> invalidSigningKeys() const;
 

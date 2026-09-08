@@ -91,6 +91,7 @@ public:
     int notImported() const;
     int numV3KeysSkipped() const;
 
+    unsigned int numImports() const;
     Import import(unsigned int idx) const;
     std::vector<Import> imports() const;
 

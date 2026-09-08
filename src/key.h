@@ -163,6 +163,7 @@ public:
     const char *issuerName() const;
     const char *chainID() const;
 
+    /*! Returns a pointer to the key ID of the primary (sub)key. */
     const char *keyID() const;
     const char *shortKeyID() const;
     const char *primaryFingerprint() const;
@@ -290,6 +291,9 @@ public:
     bool isCardKey() const;
 
     bool isSecret() const;
+
+    /*! Returns true if this is the primary (sub)key. */
+    bool isPrimaryKey() const;
 
     /** Same as gpgme_pubkey_algo_t */
     enum PubkeyAlgo {

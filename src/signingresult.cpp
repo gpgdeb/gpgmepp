@@ -107,6 +107,11 @@ void GpgME::SigningResult::init(gpgme_ctx_t ctx)
 
 make_standard_stuff(SigningResult)
 
+unsigned int GpgME::SigningResult::numCreatedSignatures() const
+{
+    return d ? d->created.size() : 0;
+}
+
 GpgME::CreatedSignature GpgME::SigningResult::createdSignature(unsigned int idx) const
 {
     return CreatedSignature(d, idx);
@@ -123,6 +128,11 @@ std::vector<GpgME::CreatedSignature> GpgME::SigningResult::createdSignatures() c
         result.push_back(CreatedSignature(d, i));
     }
     return result;
+}
+
+unsigned int GpgME::SigningResult::numInvalidSigningKeys() const
+{
+    return d ? d->invalid.size() : 0;
 }
 
 GpgME::InvalidSigningKey GpgME::SigningResult::invalidSigningKey(unsigned int idx) const
