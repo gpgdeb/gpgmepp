@@ -624,6 +624,11 @@ bool Subkey::isSecret() const
     return subkey && subkey->secret;
 }
 
+bool Subkey::isPrimaryKey() const
+{
+    return subkey == key->subkeys;
+}
+
 unsigned int Subkey::length() const
 {
     return subkey ? subkey->length : 0 ;

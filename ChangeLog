@@ -1,3 +1,44 @@
+2026-09-01  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Release 2.2.0.
+	+ commit 1b3da8425856c558fe31d6d85aa99e1f9ec5bc9f
+
+
+2026-08-10  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add missing getters for size of lists.
+	+ commit e52fd1d625f1cd0a69981a372a8ec020e0c5195a
+	* src/importresult.cpp, src/importresult.h (ImportResult::numImports):
+	New.
+	* src/signingresult.cpp, src/signingresult.h
+	(SigningResult::numCreatedSignatures,
+	SigningResult::numInvalidSigningKeys): New.
+	* src/verificationresult.cpp, src/verificationresult.h
+	(Signature::numNotations): New.
+
+2026-08-04  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Require GpgME 2.1.3.
+	+ commit b7321a42be9bfe525100b38f38d80deeaf52554e
+	* CMakeLists.txt: Require gpgme 2.1.3
+
+	Provide serial number and issuer of unknown S/MIME signing certificates.
+	+ commit f5fa2ae19e2b57f66f1e544fddaa021419fd7840
+	* src/verificationresult.cpp, src/verificationresult.h
+	(Signature::issuerSerial, Signature::issuerName): New.
+
+2026-08-03  tachalorah  <tachalorah@proton.me>
+
+	Add missing header.
+	+ commit 037a5f8d6555a57df52934349bac7c4e5ad6523d
+	* src/util.cpp: add missing <iterator> for std::back_inserter
+
+2026-07-08  Ingo Klöcker  <dev@ingo-kloecker.de>
+
+	Add function to check if subkey is primary (sub)key.
+	+ commit 92dc7035b56c300ada0491999e507f34945a9998
+	* src/key.cpp, src/key.h (Subkey::isPrimaryKey): New.
+
 2026-05-18  Werner Koch  <wk@gnupg.org>
 
 	Release 2.1.0.

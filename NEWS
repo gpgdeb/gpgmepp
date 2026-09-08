@@ -1,3 +1,27 @@
+Noteworthy changes in version 2.2.0 (2026-09-01)  [C9/A2/R0]
+------------------------------------------------
+
+ * Signature now provides issuer serial number and issuer name for S/MIME
+   certificates used for signing that are not included in a signature.
+   [T8369]
+
+ * Added missing getters for the number of notations of a signature
+   and the numbers of created signatures and of invalid signing keys of
+   a signing result.  [rGPGMEPPe52fd1d6]
+
+ * Interface changes relative to the 2.1.0 release:
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ Subkey::isPrimaryKey                        NEW.
+ Signature::issuerSerial                     NEW.
+ Signature::issuerName                       NEW.
+ ImportResult::numImports                    NEW.
+ Signature::numNotations                     NEW.
+ SigningResult::numCreatedSignatures         NEW.
+ SigningResult::numInvalidSigningKeys        NEW.
+
+ Release-info: https://dev.gnupg.org/T8431
+
+
 Noteworthy changes in version 2.1.0 (2026-05-18)  [C8/A1/R0]
 ------------------------------------------------
 
